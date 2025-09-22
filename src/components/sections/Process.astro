@@ -1,0 +1,154 @@
+---
+// src/components/sections/Process.astro - WERSJA POPRAWIONA I USZCZELNIONA
+import InteractiveTimeline from '../ui/InteractiveTimeline.svelte';
+
+// POPRAWKA: Oto pełna, poprawna składniowo definicja 'steps'
+const steps = [
+    { 
+        id: 1,
+        title: "Audyt i Strategia", 
+        description: "Analizujemy Twoją placówkę, identyfikujemy potencjał i tworzymy dedykowany plan działania.",
+        details: [
+            "Kompleksowa analiza obecnego stanu placówki",
+            "Identyfikacja obszarów z największym potencjałem wzrostu",
+            "Ocena zgodności z aktualnymi wymogami prawnymi",
+            "Opracowanie dedykowanej strategii rozwoju",
+            "Prezentacja rekomendacji i harmonogramu wdrożenia"
+        ],
+        duration: "2-3 tygodnie",
+        icon: "audit"
+    },
+    { 
+        id: 2,
+        title: "Wdrożenie i Szkolenia", 
+        description: "Implementujemy narzędzia, procedury i szkolimy personel, aby zapewnić płynne przejęcie nowych obowiązków.",
+        details: [
+            "Wdrożenie nowych procedur i dokumentacji",
+            "Konfiguracja systemów i narzędzi",
+            "Kompleksowe szkolenia dla całego personelu",
+            "Testowanie i optymalizacja procesów",
+            "Wsparcie w pierwszych tygodniach działania"
+        ],
+        duration: "4-6 tygodni",
+        icon: "implementation"
+    },
+    { 
+        id: 3,
+        title: "Ciągłe Wsparcie i Rozwój", 
+        description: "Monitorujemy wyniki, optymalizujemy procesy i zapewniamy bieżące wsparcie prawne i organizacyjne.",
+        details: [
+            "Regularne monitorowanie kluczowych wskaźników",
+            "Ciągła optymalizacja procesów",
+            "Bieżące wsparcie prawne i merytoryczne",
+            "Aktualizacja procedur zgodnie ze zmianami prawa",
+            "Okresowe audyty i rekomendacje rozwoju"
+        ],
+        duration: "Ciągle",
+        icon: "support"
+    }
+];
+---
+
+<section id="proces" class="py-20 sm:py-32 bg-background-light relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5">
+        <svg class="w-full h-full" viewBox="0 0 1200 800">
+            <defs>
+                <marker id="arrowhead-process" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#00A9E0" opacity="0.3"/>
+                </marker>
+            </defs>
+            <path d="M100,400 Q400,350 800,400 Q1000,420 1100,400" stroke="#00A9E0" stroke-width="2" fill="none" opacity="0.2" marker-end="url(#arrowhead-process)" class="animate-process-flow"/>
+            <circle cx="200" cy="380" r="4" fill="#00A9E0" opacity="0.3" class="animate-pulse-process"/>
+            <circle cx="600" cy="410" r="4" fill="#00A9E0" opacity="0.3" class="animate-pulse-process-delay"/>
+            <circle cx="1000" cy="405" r="4" fill="#00A9E0" opacity="0.3" class="animate-pulse-process-delay-2"/>
+        </svg>
+    </div>
+
+    <div class="relative z-10 max-w-5xl mx-auto px-4">
+        <div class="text-center mb-16 animate-reveal">
+            <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                Trzy kroki do pełnej optymalizacji.
+            </h2>
+            <p class="text-lg text-text-muted max-w-3xl mx-auto">
+                Nasz sprawdzony proces zapewnia systematyczne wdrożenie zmian i osiągnięcie mierzalnych rezultatów w każdej placówce.
+            </p>
+        </div>
+
+        <InteractiveTimeline {steps} client:load />
+
+        <div class="mt-16 bg-gradient-to-r from-brand-blue/5 to-background-muted p-8 rounded-2xl animate-reveal">
+            <div class="text-center">
+                <h3 class="text-xl font-semibold text-text-primary mb-4">
+                    Gotowy na rozpoczęcie transformacji?
+                </h3>
+                <p class="text-text-muted mb-6">
+                    Pierwsza konsultacja jest <span class="font-semibold text-brand-blue">bezpłatna</span>. 
+                    Ocenimy potencjał Twojej placówki i przedstawimy konkretny plan działania.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="#kontakt" class="btn-primary inline-flex items-center">
+                        Zacznijmy współpracę
+                        <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                    <div class="flex items-center text-text-muted">
+                        <svg class="w-5 h-5 mr-2 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Odpowiedź w ciągu 24h</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    @keyframes process-flow {
+        from { stroke-dasharray: 1200; stroke-dashoffset: 1200; }
+        to { stroke-dasharray: 1200; stroke-dashoffset: 0; }
+    }
+    
+    @keyframes pulse-process {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.3); }
+    }
+    
+    .animate-process-flow { 
+        animation: process-flow 4s ease-out 0.5s forwards; 
+        stroke-dasharray: 1200; 
+        stroke-dashoffset: 1200; 
+    }
+    .animate-pulse-process { animation: pulse-process 3s ease-in-out infinite; }
+    .animate-pulse-process-delay { animation: pulse-process 3s ease-in-out infinite 1s; }
+    .animate-pulse-process-delay-2 { animation: pulse-process 3s ease-in-out infinite 2s; }
+
+    /* Animacja wejścia dla elementów sekcji */
+    .animate-reveal {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .animate-reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-reveal').forEach(el => {
+            observer.observe(el);
+        });
+    });
+</script>

@@ -1,0 +1,15 @@
+---
+// src/components/ui/Logo.astro
+import { Image } from 'astro:assets';
+import logoSvg from '../../assets/logo.svg'; // Upewnij się, że plik nazywa się 'logo.svg'
+
+interface Props {
+    width?: number;
+    className?: string;
+}
+
+const { width = 150, className } = Astro.props;
+---
+<div class:list={["logo-container", className]}>
+    <Image src={logoSvg} alt="Koordynuj Zdrowie Logo" width={width} />
+</div>

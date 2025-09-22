@@ -1,0 +1,25 @@
+---
+// src/pages/index.astro - WERSJA BEZ INTRO
+import MainLayout from '../layouts/MainLayout.astro';
+import Hero from '../components/sections/Hero.astro';
+import Problems from '../components/sections/Problem.astro';
+import Services from '../components/sections/Services.astro';
+import CaseStudy from '../components/sections/CaseStudy.astro';
+import Process from '../components/sections/Process.astro';
+import Contact from '../components/sections/Contact.astro';
+---
+
+<MainLayout 
+    title="Koordynuj Zdrowie - Zarządzanie medycyną. Zredukowane do perfekcji."
+    description="Podnosimy efektywność placówki, domykamy rozliczenia i dbamy o zgodność prawną. Uwalniamy Cię od chaosu."
+>
+    <main id="main-content">
+        <Hero />
+        
+        <Problems />
+        <Services />
+        <CaseStudy />
+        <Process />
+        <Contact />
+    </main>
+</MainLayout>

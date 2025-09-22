@@ -1,0 +1,9 @@
+<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+  <path 
+    id="pulse-path"
+    fill="none" 
+    stroke="white" 
+    stroke-width="2" 
+    d="M 10 50 L 60 50 L 75 30 L 105 70 L 120 50 L 190 50" 
+  />
+</svg>

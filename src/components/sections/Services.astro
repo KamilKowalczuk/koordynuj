@@ -1,0 +1,352 @@
+---
+// src/components/sections/Services.astro - AKT 3: INTERWENCJA
+import ServicesGrid from '../ui/ServicesGrid.svelte';
+
+// PRAWDZIWE DANE Z BRIEFU KLIENTA - 4 FILARY OFERTY
+const services = [
+    { 
+        id: 1,
+        title: "Profilaktyka i Koordynacja POZ", 
+        shortDescription: "Najbardziej opłacalny kierunek rozwoju, który zwiększa przychody i buduje przewagę konkurencyjną.",
+        icon: "prevention",
+        whyWorthIt: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Dlaczego warto?</h4>
+            <p class="mb-4">Wdrożenie opieki koordynowanej i aktywne prowadzenie programów profilaktycznych to obecnie najbardziej opłacalny kierunek rozwoju POZ. Dzięki nowym regulacjom NFZ placówki mogą:</p>
+            <ul class="space-y-2 mb-6">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> zwiększyć przychody poprzez dodatkowe finansowanie i wyższe ryczałty</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> poprawić wyniki zdrowotne pacjentów</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> zbudować przewagę konkurencyjną na rynku lokalnym</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> ograniczyć koszty badań kontrolnych pacjentów</li>
+            </ul>
+        `,
+        scope: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Zakres naszej oferty</h4>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <h5 class="font-semibold mb-2">A. Opieka koordynowana</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Kompletny zestaw procedur i dokumentacji NFZ</li>
+                        <li>• Ścieżki opieki (diabetologia, kardiologia, alergologia)</li>
+                        <li>• Organizacja zespołu interdyscyplinarnego</li>
+                        <li>• System monitorowania pacjentów</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-2">B. Programy profilaktyczne</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Moje Zdrowie</li>
+                        <li>• Program Profilaktyki Chorób Układu Krążenia</li>
+                        <li>• Profilaktyka Chorób Gruźlicy</li>
+                        <li>• Materiały edukacyjne i raportowanie</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        benefits: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Korzyści</h4>
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <h5 class="font-semibold text-brand-blue mb-2"><span class="mr-2">+</span>Dla placówki POZ</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Wzrost przychodów z NFZ</li>
+                        <li>• Efektywne zarządzanie</li>
+                        <li>• Wizerunek lidera</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-brand-blue mb-2"><span class="mr-2">+</span>Dla pacjentów</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Łatwiejszy dostęp do badań</li>
+                        <li>• Kompleksowa opieka</li>
+                        <li>• Personalizowane plany zdrowotne</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        collaborationModel: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Model współpracy</h4>
+            <p class="mb-4">Oferujemy pakiet całościowy, obejmujący wszystkie działania potrzebne do wdrożenia i prowadzenia opieki koordynowanej oraz programów profilaktycznych w POZ:</p>
+            <ul class="space-y-2">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Możliwość pełnego outsourcingu koordynacji</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Szkolenia dla personelu</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Wsparcie prawne i organizacyjne</li>
+            </ul>
+        `
+    },
+    { 
+        id: 2,
+        title: "Rozliczenia NFZ i Efektywność", 
+        shortDescription: "Gwarancja stabilnych przychodów i wzrost rentowności przy niezmienionym nakładzie pracy.",
+        icon: "efficiency",
+        whyWorthIt: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Dlaczego warto?</h4>
+            <p class="mb-4">Sprawne i prawidłowe rozliczanie świadczeń z NFZ oraz optymalizacja procesów w placówce to:</p>
+            <ul class="space-y-2 mb-4">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> gwarancja stabilnych przychodów</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> uniknięcie ryzyka kar i zwrotów refundacji</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> lepsze zarządzanie personelem i zasobami</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> wzrost rentowności przy niezmienionym nakładzie pracy</li>
+            </ul>
+            <p class="text-sm bg-blue-50 p-3 rounded">💡 Większość firm zajmujących się rozliczeniami z NFZ ogranicza się wyłącznie do obsługi formalnej. Naszym priorytetem jest kompleksowe podejście z dokładną analizą i pomocą w poprawie błędów.</p>
+        `,
+        scope: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Zakres naszej oferty</h4>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <h5 class="font-semibold mb-2">A. Rozliczenia NFZ</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Analiza poprawności dokumentacji medycznej i finansowej</li>
+                        <li>• Weryfikacja zgodności świadczeń z zarządzeniami NFZ</li>
+                        <li>• Przygotowanie wzorców dokumentów</li>
+                        <li>• Doradztwo podczas kontroli NFZ</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-2">B. Poprawa efektywności</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Audyt organizacyjny</li>
+                        <li>• Procedury usprawniające pracę</li>
+                        <li>• Optymalizacja grafiku personelu</li>
+                        <li>• Rekomendacje programów NFZ i komercyjnych</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        benefits: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Korzyści</h4>
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <h5 class="font-semibold text-brand-blue mb-2"><span class="mr-2">+</span>Dla placówki POZ</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Stabilne i wyższe przychody</li>
+                        <li>• Oszczędności kosztowe</li>
+                        <li>• Poprawa jakości zarządzania</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-brand-blue mb-2"><span class="mr-2">+</span>Dla pacjentów</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Sprawniejsza obsługa administracyjna</li>
+                        <li>• Krótszy czas oczekiwania</li>
+                        <li>• Wyższa jakość obsługi</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        collaborationModel: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Model współpracy</h4>
+            <p class="mb-4">Oferujemy kompleksowe wsparcie w zakresie rozliczeń i efektywności działalności:</p>
+            <ul class="space-y-2">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Stały nadzór nad dokumentacją i raportami do NFZ</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Wsparcie pracowników rejestracji</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Audyty i rekomendacje dla poprawy rentowności</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Możliwość outsourcingu całego procesu rozliczeń</li>
+            </ul>
+        `
+    },
+    { 
+        id: 3,
+        title: "Pakiet Obsługi Prawnej", 
+        shortDescription: "Pełne bezpieczeństwo prawne i zgodność działania z wymogami NFZ, Sanepidu i UODO.",
+        icon: "legal",
+        whyWorthIt: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Dlaczego warto?</h4>
+            <p class="mb-4">Profesjonalna obsługa prawna w gabinecie medycznym to gwarancja:</p>
+            <ul class="space-y-2 mb-6">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> zgodności działalności z aktualnymi wymogami prawnymi i NFZ</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> bezpieczeństwa wobec kontroli NFZ, Sanepidu, UODO</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> ochrony przed wysokimi karami finansowymi z RODO</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> oszczędności czasu personelu</li>
+            </ul>
+        `,
+        scope: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Zakres naszej oferty</h4>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <h5 class="font-semibold mb-2">A. Dokumentacja prawno-organizacyjna</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Regulamin organizacyjny podmiotu leczniczego</li>
+                        <li>• Standardy Ochrony Małoletnich</li>
+                        <li>• Informacja o prawach pacjenta</li>
+                        <li>• Wzory zgód pacjenta na leczenie</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-2">B. RODO</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Pełny pakiet dokumentacji RODO</li>
+                        <li>• Klauzule informacyjne</li>
+                        <li>• Rejestry czynności przetwarzania</li>
+                        <li>• Polityka prywatności strony internetowej</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-2">C. Alerty i wsparcie prawne</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Monitoring zmian w przepisach</li>
+                        <li>• Alerty o zmianach w zarządzeniach NFZ</li>
+                        <li>• Konsultacje prawne online</li>
+                        <li>• Wsparcie przy kontrolach</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        benefits: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Korzyści</h4>
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <h5 class="font-semibold text-brand-blue mb-2"><span class="mr-2">+</span>Dla placówki POZ</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Bezpieczeństwo prawne</li>
+                        <li>• Sprawna organizacja</li>
+                        <li>• Stabilność działania</li>
+                        <li>• Wsparcie ekspertów</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-brand-blue mb-2"><span class="mr-2">+</span>Dla pacjentów</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Jasne informacje o prawach</li>
+                        <li>• Poczucie bezpieczeństwa</li>
+                        <li>• Wyższa jakość obsługi</li>
+                        <li>• Ochrona danych zgodnie z RODO</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        collaborationModel: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Model współpracy</h4>
+            <p class="mb-4">Oferujemy wsparcie prawne dla gabinetów medycznych:</p>
+            <ul class="space-y-2">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Pełny pakiet dokumentacji RODO i medycznej</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Monitoring zmian prawnych i alerty</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Doradztwo i konsultacje</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Wsparcie w trakcie kontroli</li>
+            </ul>
+        `
+    },
+    { 
+        id: 4,
+        title: "Wsparcie na Start Placówki", 
+        shortDescription: "Bezpieczny start działalności bez ryzyka opóźnień i błędów formalnych.",
+        icon: "startup",
+        whyWorthIt: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Dlaczego warto?</h4>
+            <p class="mb-4">Otwarcie nowej placówki medycznej lub gabinetu prywatnego to proces wymagający spełnienia wielu wymogów. Profesjonalna koordynacja pozwala:</p>
+            <ul class="space-y-2 mb-6">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> uniknąć błędów formalnych skutkujących opóźnieniem startu</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> uzyskać wpis do rejestru w najkrótszym czasie</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> przygotować placówkę do kontroli</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> zaoszczędzić czas i pieniądze właściciela</li>
+            </ul>
+        `,
+        scope: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Zakres naszej oferty</h4>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <h5 class="font-semibold mb-2">A. Rejestracja i formalności</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Wpis do Rejestru Podmiotów Leczniczych</li>
+                        <li>• Przygotowanie dokumentów rejestrowych</li>
+                        <li>• Konsultacje przy wyborze formy prawnej</li>
+                        <li>• Uzyskanie pozwoleń (Sanepid, BHP, ppoż.)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-2">B. Organizacja pracy</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Procedury przyjęcia pacjenta</li>
+                        <li>• Konfiguracja systemu gabinetowego</li>
+                        <li>• Standardy obsługi pacjenta</li>
+                        <li>• Lista wyposażenia na start</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-2">C. Współprace i logistyka</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Gospodarka odpadami medycznymi</li>
+                        <li>• Zamówienia leków i produktów leczniczych</li>
+                        <li>• Sterylizacja narzędzi</li>
+                        <li>• Usługi sprzątające</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        benefits: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Korzyści</h4>
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <h5 class="font-semibold text-brand-blue mb-2"><span class="mr-2">+</span>Dla placówki</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Bezpieczny start działalności</li>
+                        <li>• Oszczędność czasu i kosztów</li>
+                        <li>• Sprawne kontrole</li>
+                        <li>• Profesjonalny zespół</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold text-brand-blue mb-2"><span class="mr-2">+</span>Dla pacjentów</h5>
+                    <ul class="text-sm space-y-1">
+                        <li>• Profesjonalna obsługa od pierwszego dnia</li>
+                        <li>• Jasne informacje o prawach</li>
+                        <li>• Bezpieczeństwo danych</li>
+                        <li>• Zaufanie do placówki</li>
+                    </ul>
+                </div>
+            </div>
+        `,
+        collaborationModel: `
+            <h4 class="text-lg font-semibold text-brand-blue mb-3">Model współpracy</h4>
+            <p class="mb-4">Oferujemy pełne wsparcie w procesie otwierania placówki:</p>
+            <ul class="space-y-2">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Przygotowanie i złożenie dokumentów rejestrowych</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Wdrożenie kompletnej dokumentacji</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Organizacja współpracy z partnerami</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Bieżące wsparcie w pierwszych miesiącach</li>
+            </ul>
+        `
+    }
+];
+---
+
+<section id="oferta" class="py-20 sm:py-32 bg-background-light relative overflow-hidden">
+    <!-- Geometryczne tło sugerujące porządek -->
+    <div class="absolute inset-0 opacity-5">
+        <svg class="w-full h-full" viewBox="0 0 1200 800">
+            <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00A9E0" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+    </div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-4">
+        <!-- Nagłówek sekcji zgodny z briefem -->
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                Nasze 4 filary. Twoja droga do porządku.
+            </h2>
+            <p class="text-lg text-text-muted max-w-3xl mx-auto">
+                Kompleksowe rozwiązania, które przekształcą Twoją placówkę w nowoczesną, efektywną i prawnie bezpieczną organizację.
+            </p>
+        </div>
+
+        <!-- Interaktywny grid usług -->
+        <ServicesGrid {services} client:load />
+
+        <!-- Wezwanie do działania -->
+        <div class="text-center mt-16">
+            <p class="text-lg text-text-muted mb-6">
+                Gotowy na <span class="font-semibold text-brand-blue">transformację</span> swojej placówki?
+            </p>
+            <a href="#kontakt" class="btn-primary inline-flex items-center">
+                Umów bezpłatną konsultację
+                <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,122 @@
+---
+// src/components/sections/CaseStudy.astro - WERSJA PEŁNA I POPRAWIONA
+import AnimatedCounter from '../ui/AnimatedCounter.svelte';
+
+const metrics = [
+    { value: 27, suffix: "%", prefix: "+", description: "wzrost przychodów z programów profilaktycznych", color: "blue" },
+    { value: 15, suffix: "h", prefix: "-", description: "oszczędności czasu na administracji tygodniowo", color: "green" },
+    { value: 100, suffix: "%", prefix: "", description: "zgodność rozliczeń po 3 miesiącach", color: "blue" }
+];
+---
+
+<section id="dowod" class="py-20 sm:py-32 bg-background-muted relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5">
+        <svg class="w-full h-full" viewBox="0 0 1200 800">
+            <g class="animate-chart-bars">
+                <rect x="100" y="600" width="30" height="200" fill="#00A9E0" opacity="0.3"/>
+                <rect x="150" y="500" width="30" height="300" fill="#00A9E0" opacity="0.4"/>
+                <rect x="200" y="450" width="30" height="350" fill="#00A9E0" opacity="0.3"/>
+                <rect x="250" y="400" width="30" height="400" fill="#00A9E0" opacity="0.5"/>
+                <rect x="300" y="300" width="30" height="500" fill="#00A9E0" opacity="0.3"/>
+            </g>
+            <path d="M50,650 Q300,400 600,300 T1150,200" stroke="#00A9E0" stroke-width="2" fill="none" opacity="0.2" class="animate-trend-line"/>
+            <circle cx="115" cy="600" r="3" fill="#00A9E0" opacity="0.4" class="animate-pulse-data"/>
+            <circle cx="165" cy="500" r="3" fill="#00A9E0" opacity="0.4" class="animate-pulse-data-delay-1"/>
+            <circle cx="215" cy="450" r="3" fill="#00A9E0" opacity="0.4" class="animate-pulse-data-delay-2"/>
+        </svg>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-3xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
+                Precyzja, którą można zmierzyć.
+            </h2>
+            <p class="text-lg text-text-muted mb-16 md:mb-24">
+                Studium Przypadku: <span class="font-semibold text-text-primary">NZOZ "Nowa Jakość"</span>. Realne dane, realne rezultaty.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 md:mb-24">
+            {metrics.map((metric) => (
+                <div class="card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-300 hover:border-brand-blue/50 hover:shadow-lg text-center">
+                    
+                    <div class="mb-4">
+                        <AnimatedCounter 
+                            targetValue={metric.value}
+                            prefix={metric.prefix}
+                            suffix={metric.suffix}
+                            color={metric.color}
+                            client:visible
+                        />
+                    </div>
+                    
+                    <p class="text-text-muted leading-relaxed group-hover:text-text-primary transition-colors duration-300">
+                        {metric.description}
+                    </p>
+                </div>
+            ))}
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white border border-slate-200/80 rounded-3xl shadow-sm p-8 md:p-12 relative transition-all duration-300 hover:border-brand-blue/50 hover:shadow-lg">
+                <div class="absolute -top-4 -left-4 w-16 h-16 bg-brand-blue/10 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-brand-blue" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                    </svg>
+                </div>
+
+                <blockquote class="text-xl md:text-2xl text-text-primary leading-relaxed mb-6 pl-8">
+                    "Współpraca, która realnie przekłada się na wyniki finansowe i spokój w zarządzaniu. Zespół Koordynuj Zdrowie to partner, a nie tylko dostawca."
+                </blockquote>
+
+                <div class="flex items-center pl-8">
+                    <div class="w-12 h-12 bg-gradient-to-br from-brand-blue to-brand-blue/80 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold">JK</span>
+                    </div>
+                    <div class="ml-4">
+                        <p class="font-semibold text-text-primary">Dr Janusz Kowalski</p>
+                        <p class="text-text-muted">Dyrektor, NZOZ "Nowa Jakość"</p>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-4 right-4 w-24 h-24 bg-gradient-to-br from-brand-blue/5 to-transparent rounded-full"></div>
+            </div>
+        </div>
+
+        <div class="text-center mt-16 md:mt-24">
+            <p class="text-lg text-text-muted mb-6">
+                Chcesz osiągnąć podobne <span class="font-semibold text-brand-blue">wymierne rezultaty</span>?
+            </p>
+            <a href="#kontakt" class="btn-primary inline-flex items-center">
+                Sprawdź potencjał swojej placówki
+                <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+    @keyframes chart-bars {
+        0%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(1.1); }
+    }
+    
+    @keyframes trend-line {
+        from { stroke-dasharray: 1000; stroke-dashoffset: 1000; }
+        to { stroke-dasharray: 1000; stroke-dashoffset: 0; }
+    }
+    
+    @keyframes pulse-data {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.5); }
+    }
+    
+    .animate-chart-bars { animation: chart-bars 8s ease-in-out infinite; }
+    .animate-trend-line { animation: trend-line 3s ease-out 1s forwards; stroke-dasharray: 1000; stroke-dashoffset: 1000; }
+    .animate-pulse-data { animation: pulse-data 2s ease-in-out infinite; }
+    .animate-pulse-data-delay-1 { animation: pulse-data 2s ease-in-out infinite 0.5s; }
+    .animate-pulse-data-delay-2 { animation: pulse-data 2s ease-in-out infinite 1s; }
+</style>

@@ -1,9 +1,13 @@
 ---
-// src/components/sections/Services.astro - AKT 3: INTERWENCJA
+// src/components/sections/Services.astro - WERSJA DYNAMICZNA
 import ServicesGrid from '../ui/ServicesGrid.svelte';
+import { getServices } from '../../lib/strapi';
 
-// PRAWDZIWE DANE Z BRIEFU KLIENTA - 4 FILARY OFERTY
-const services = [
+// Pobieramy dane z Strapi
+const servicesData = await getServices();
+
+// Fallback dane w przypadku braku połączenia ze Strapi
+const fallbackServices = [
     { 
         id: 1,
         title: "Profilaktyka i Koordynacja POZ", 
@@ -87,7 +91,6 @@ const services = [
                 <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> lepsze zarządzanie personelem i zasobami</li>
                 <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> wzrost rentowności przy niezmienionym nakładzie pracy</li>
             </ul>
-            <p class="text-sm bg-blue-50 p-3 rounded">💡 Większość firm zajmujących się rozliczeniami z NFZ ogranicza się wyłącznie do obsługi formalnej. Naszym priorytetem jest kompleksowe podejście z dokładną analizą i pomocą w poprawie błędów.</p>
         `,
         scope: `
             <h4 class="text-lg font-semibold text-brand-blue mb-3">Zakres naszej oferty</h4>
@@ -151,24 +154,24 @@ const services = [
         icon: "legal",
         whyWorthIt: `
             <h4 class="text-lg font-semibold text-brand-blue mb-3">Dlaczego warto?</h4>
-            <p class="mb-4">Profesjonalna obsługa prawna w gabinecie medycznym to gwarancja:</p>
-            <ul class="space-y-2 mb-6">
-                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> zgodności działalności z aktualnymi wymogami prawnymi i NFZ</li>
-                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> bezpieczeństwa wobec kontroli NFZ, Sanepidu, UODO</li>
-                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> ochrony przed wysokimi karami finansowymi z RODO</li>
-                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> oszczędności czasu personelu</li>
+            <p class="mb-4">Kompleksowe wsparcie prawne zapewniające zgodność z wszystkimi przepisami obowiązującymi w ochronie zdrowia:</p>
+            <ul class="space-y-2 mb-4">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> zabezpieczenie przed wysokimi karami finansowymi</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> pewność zgodności z RODO, NFZ i Sanepidem</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> bieżące monitorowanie zmian w przepisach</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> profesjonalne wsparcie podczas kontroli</li>
             </ul>
         `,
         scope: `
             <h4 class="text-lg font-semibold text-brand-blue mb-3">Zakres naszej oferty</h4>
-            <div class="space-y-4 mb-6">
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                    <h5 class="font-semibold mb-2">A. Dokumentacja prawno-organizacyjna</h5>
+                    <h5 class="font-semibold mb-2">A. Dokumentacja medyczna</h5>
                     <ul class="text-sm space-y-1">
-                        <li>• Regulamin organizacyjny podmiotu leczniczego</li>
-                        <li>• Standardy Ochrony Małoletnich</li>
-                        <li>• Informacja o prawach pacjenta</li>
-                        <li>• Wzory zgód pacjenta na leczenie</li>
+                        <li>• Regulaminy gabinetu i placówki</li>
+                        <li>• Procedury medyczne i organizacyjne</li>
+                        <li>• Dokumentacja wymagana przez Sanepid</li>
+                        <li>• Instrukcje dla personelu</li>
                     </ul>
                 </div>
                 <div>
@@ -178,15 +181,6 @@ const services = [
                         <li>• Klauzule informacyjne</li>
                         <li>• Rejestry czynności przetwarzania</li>
                         <li>• Polityka prywatności strony internetowej</li>
-                    </ul>
-                </div>
-                <div>
-                    <h5 class="font-semibold mb-2">C. Alerty i wsparcie prawne</h5>
-                    <ul class="text-sm space-y-1">
-                        <li>• Monitoring zmian w przepisach</li>
-                        <li>• Alerty o zmianach w zarządzeniach NFZ</li>
-                        <li>• Konsultacje prawne online</li>
-                        <li>• Wsparcie przy kontrolach</li>
                     </ul>
                 </div>
             </div>
@@ -232,24 +226,24 @@ const services = [
         icon: "startup",
         whyWorthIt: `
             <h4 class="text-lg font-semibold text-brand-blue mb-3">Dlaczego warto?</h4>
-            <p class="mb-4">Otwarcie nowej placówki medycznej lub gabinetu prywatnego to proces wymagający spełnienia wielu wymogów. Profesjonalna koordynacja pozwala:</p>
-            <ul class="space-y-2 mb-6">
-                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> uniknąć błędów formalnych skutkujących opóźnieniem startu</li>
-                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> uzyskać wpis do rejestru w najkrótszym czasie</li>
-                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> przygotować placówkę do kontroli</li>
-                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> zaoszczędzić czas i pieniądze właściciela</li>
+            <p class="mb-4">Otwarcie placówki medycznej to skomplikowany proces wymagający znajomości wielu przepisów. Nasze wsparcie zapewnia:</p>
+            <ul class="space-y-2 mb-4">
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> uniknięcie kosztownych błędów i opóźnień</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> sprawny przebieg procesu rejestracji</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> kompleksowe przygotowanie do działalności</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">✓</span> profesjonalny start bez stresu</li>
             </ul>
         `,
         scope: `
             <h4 class="text-lg font-semibold text-brand-blue mb-3">Zakres naszej oferty</h4>
-            <div class="space-y-4 mb-6">
+            <div class="grid md:grid-cols-3 gap-4 mb-6">
                 <div>
-                    <h5 class="font-semibold mb-2">A. Rejestracja i formalności</h5>
+                    <h5 class="font-semibold mb-2">A. Formalnościrejestrowe</h5>
                     <ul class="text-sm space-y-1">
-                        <li>• Wpis do Rejestru Podmiotów Leczniczych</li>
-                        <li>• Przygotowanie dokumentów rejestrowych</li>
-                        <li>• Konsultacje przy wyborze formy prawnej</li>
-                        <li>• Uzyskanie pozwoleń (Sanepid, BHP, ppoż.)</li>
+                        <li>• Rejestracja w systemie NFZ</li>
+                        <li>• Uzyskanie zgód Sanepidu</li>
+                        <li>• Rejestracja w OIL</li>
+                        <li>• Formalnościpodatkowe (VAT)</li>
                     </ul>
                 </div>
                 <div>
@@ -262,10 +256,10 @@ const services = [
                     </ul>
                 </div>
                 <div>
-                    <h5 class="font-semibold mb-2">C. Współprace i logistyka</h5>
+                    <h5 class="font-semibold mb-2">C. Współprace</h5>
                     <ul class="text-sm space-y-1">
                         <li>• Gospodarka odpadami medycznymi</li>
-                        <li>• Zamówienia leków i produktów leczniczych</li>
+                        <li>• Zamówienia leków</li>
                         <li>• Sterylizacja narzędzi</li>
                         <li>• Usługi sprzątające</li>
                     </ul>
@@ -301,12 +295,32 @@ const services = [
             <ul class="space-y-2">
                 <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Przygotowanie i złożenie dokumentów rejestrowych</li>
                 <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Wdrożenie kompletnej dokumentacji</li>
-                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Organizacja współpracy z partnerami</li>
+                <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Organizacja wszystkich współpracy i procedur</li>
                 <li class="flex items-start"><span class="text-brand-blue mr-2">→</span> Bieżące wsparcie w pierwszych miesiącach</li>
             </ul>
         `
     }
 ];
+
+// Transformujemy dane ze Strapi aby zachować kompatybilność z istniejącym kodem
+const transformStrapiServices = (strapiServices: any[]) => {
+    return strapiServices.map(service => ({
+        id: service.id,
+        title: service.title,
+        shortDescription: service.shortDescription,
+        icon: service.icon,
+        // Używamy fullDescription jako whyWorthIt jeśli scope nie istnieje
+        whyWorthIt: service.scope || service.fullDescription,
+        scope: service.scope,
+        benefits: service.benefits,
+        collaborationModel: service.collaborationModel
+    }));
+};
+
+// Używamy danych ze Strapi lub fallback
+const services = servicesData && servicesData.length > 0 
+    ? transformStrapiServices(servicesData) 
+    : fallbackServices;
 ---
 
 <section id="oferta" class="py-20 sm:py-32 bg-background-light relative overflow-hidden">

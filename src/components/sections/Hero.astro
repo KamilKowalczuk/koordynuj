@@ -1,34 +1,52 @@
 ---
-// src/components/sections/Hero.astro - FIXED: Desktop Positioning
+// src/components/sections/Hero.astro - WERSJA DYNAMICZNA Z ZACHOWANIEM STRUKTURY
 import InteractiveSphere from '../ui/InteractiveSphere.svelte';
+import { getHeroSection } from '../../lib/strapi';
+
+// Pobieramy dane z Strapi
+const heroData = await getHeroSection();
+
+// Fallback dane w przypadku braku połączenia ze Strapi
+const fallbackData = {
+    mainTitle: "Zarządzanie medycyną.",
+    subTitle: "Zredukowane do perfekcji.",
+    description: "Podnosimy efektywność placówki, domykamy rozliczenia i dbamy o zgodność prawną. **Uwalniamy Cię od chaosu.**",
+    ctaButtonText: "Odkryj Klarowność",
+    ctaButtonLink: "#kontakt"
+};
+
+// Używamy danych ze Strapi lub fallback
+const hero = heroData || fallbackData;
+
+// Przetwarzamy description żeby obsłużyć markdown bold
+const processDescription = (desc: string) => {
+    return desc.replace(/\*\*(.*?)\*\*/g, '<span class="block font-semibold text-text-primary mt-1">$1</span>');
+};
 ---
 <section class="relative min-h-screen bg-background-light overflow-hidden">
-    
     <div class="absolute inset-0 z-10 pointer-events-none">
         <div class="absolute top-1/2 left-1/2 w-[150vw] h-[150vw] max-w-[1000px] max-h-[1000px] -translate-x-1/2 -translate-y-1/2 lg:left-auto lg:right-0 lg:w-[55vw] lg:h-[55vw] lg:-translate-x-1/3 lg:-translate-y-1/2 opacity-50">
             <InteractiveSphere client:load />
         </div>
     </div>
-
+    
     <div class="relative z-20 mx-auto flex h-screen max-w-7xl items-center px-4 sm:px-6 lg:px-8">
         <div class="max-w-xl text-center lg:text-left">
             <div class="hero-content">
-    
                 <h1 class="text-5xl md:text-7xl font-extrabold text-text-primary leading-tight tracking-tighter hero-element" style="--delay: 400ms;">
-                    <span class="block">Zarządzanie medycyną.</span>
+                    <span class="block">{hero.mainTitle}</span>
                     <span class="block text-brand-blue mt-2">
-                        Zredukowane do perfekcji.
+                        {hero.subTitle}
                     </span>
                 </h1>
-    
+                
                 <h2 class="mt-8 text-xl text-text-muted hero-element" style="--delay: 600ms;">
-                    Podnosimy efektywność placówki, domykamy rozliczenia i dbamy o zgodność prawną. 
-                    <span class="block font-semibold text-text-primary mt-1">Uwalniamy Cię od chaosu.</span>
+                    <span set:html={processDescription(hero.description)}></span>
                 </h2>
-    
+                
                 <div class="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 hero-element" style="--delay: 800ms;">
-                    <a href="#kontakt" class="btn-primary w-full sm:w-auto text-lg px-10 py-4 group">
-                        Odkryj Klarowność
+                    <a href={hero.ctaButtonLink} class="btn-primary w-full sm:w-auto text-lg px-10 py-4 group">
+                        {hero.ctaButtonText}
                         <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                     </a>
                 </div>

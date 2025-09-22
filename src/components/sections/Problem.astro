@@ -1,26 +1,48 @@
 ---
-// src/components/sections/Problems.astro - WERSJA Z PEŁNĄ SPÓJNOŚCIĄ IKON
+// src/components/sections/Problems.astro - WERSJA DYNAMICZNA Z ZACHOWANIEM STRUKTURY
 import RevenueLossIcon from '../icons/RevenueLossIcon.astro';
 import LegalRiskIcon from '../icons/LegalRiskIcon.astro';
 import InefficiencyIcon from '../icons/InefficiencyIcon.astro';
+import { getProblems } from '../../lib/strapi';
 
-const problems = [
-    { 
-        title: "Utracone Przychody", 
+// Pobieramy dane z Strapi
+const problemsData = await getProblems();
+
+// Mapa ikon dla różnych typów problemów
+const iconMap = {
+    'revenue-loss': RevenueLossIcon,
+    'legal-risk': LegalRiskIcon,
+    'inefficiency': InefficiencyIcon
+};
+
+// Fallback dane w przypadku braku połączenia ze Strapi
+const fallbackProblems = [
+    {
+        title: "Utracone Przychody",
         description: "Środki finansowe umykają przez brak właściwej weryfikacji raportów i poprawy błędów.",
-        Icon: RevenueLossIcon
+        icon: "revenue-loss"
     },
-    { 
+    {
         title: "Ryzyko Prawne", 
         description: "Niezgodność z wymogami NFZ czy UODO to ryzyko wysokich, dotkliwych kar finansowych.",
-        Icon: LegalRiskIcon
+        icon: "legal-risk"
     },
-    { 
-        title: "Nieefektywne Procesy", 
+    {
+        title: "Nieefektywne Procesy",
         description: "Niezoptymalizowane procedury administracyjne to gwarancja wypalenia personelu.",
-        Icon: InefficiencyIcon
+        icon: "inefficiency"
     }
 ];
+
+// Używamy danych ze Strapi lub fallback
+const strapiProblems = problemsData && problemsData.length > 0 ? problemsData : fallbackProblems;
+
+// Przekształcamy dane ze Strapi do formatu z komponentami ikon
+const problems = strapiProblems.map(problem => ({
+    title: problem.title,
+    description: problem.description,
+    Icon: iconMap[problem.icon as keyof typeof iconMap] || RevenueLossIcon
+}));
 ---
 
 <section id="problemy" class="py-20 sm:py-32 bg-white">
@@ -33,20 +55,17 @@ const problems = [
                 Identyfikujemy trzy fundamentalne filary ryzyka, które po cichu erodują rentowność i bezpieczeństwo każdej placówki medycznej.
             </p>
         </div>
-
+        
         <div class="grid lg:grid-cols-3 gap-8">
             {problems.map((problem) => (
                 <div class="card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-300 hover:border-brand-blue/50 hover:shadow-lg">
-                    
                     <div class="mb-6">
                         <problem.Icon className="h-10 w-10 text-brand-blue group-hover:scale-110 transition-transform duration-300" />
                     </div>
-                    
                     <div class="flex flex-col flex-grow">
                         <h3 class="text-2xl font-bold text-text-primary mb-4">
                             {problem.title}
                         </h3>
-                        
                         <p class="text-text-muted leading-relaxed">
                             {problem.description}
                         </p>

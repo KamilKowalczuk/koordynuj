@@ -5,9 +5,9 @@
    version="1.1"
    id="svg1"
    width="1024"
-   height="1024"
-   viewBox="0 0 1024 1024"
-   sodipodi:docname="Koordynuj Zdrowie 1 v2.svg"
+   height="600"
+   viewBox="0 0 1024 600"
+   sodipodi:docname="Logo Koordynuj Zdrowie.svg"
    inkscape:export-filename="Logo Koordynuj Zdrowie.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
@@ -31,7 +31,7 @@
        x="0"
        y="0"
        width="1024"
-       height="1024"
+       height="600"
        id="page2"
        margin="0"
        bleed="0" />
@@ -56,7 +56,7 @@
      id="g1">
     <g
        id="g2"
-       transform="translate(8.894135,-48.80272)">
+       transform="translate(8.894135,-260.80272)">
       <g
          id="g13"
          transform="matrix(2.160546,0,0,2.165902,100.06724,-624.16366)">

@@ -4,74 +4,74 @@ import RevenueLossIcon from '../icons/RevenueLossIcon.astro';
 import LegalRiskIcon from '../icons/LegalRiskIcon.astro';
 import InefficiencyIcon from '../icons/InefficiencyIcon.astro';
 import { getProblems } from '../../lib/strapi';
+import DOMPurify from 'isomorphic-dompurify';
 
 // Pobieramy dane z Strapi
 const problemsData = await getProblems();
 
 // Mapa ikon dla różnych typów problemów
 const iconMap = {
-    'revenue-loss': RevenueLossIcon,
-    'legal-risk': LegalRiskIcon,
-    'inefficiency': InefficiencyIcon
+  'revenue-loss': RevenueLossIcon,
+  'legal-risk': LegalRiskIcon,
+  'inefficiency': InefficiencyIcon
 };
 
 // Fallback dane w przypadku braku połączenia ze Strapi
 const fallbackProblems = [
-    {
-        title: "Utracone Przychody",
-        description: "Środki finansowe umykają przez brak właściwej weryfikacji raportów i poprawy błędów.",
-        icon: "revenue-loss"
-    },
-    {
-        title: "Ryzyko Prawne", 
-        description: "Niezgodność z wymogami NFZ czy UODO to ryzyko wysokich, dotkliwych kar finansowych.",
-        icon: "legal-risk"
-    },
-    {
-        title: "Nieefektywne Procesy",
-        description: "Niezoptymalizowane procedury administracyjne to gwarancja wypalenia personelu.",
-        icon: "inefficiency"
-    }
+  { title: "Utracone Przychody", description: "Środki finansowe umykają przez brak właściwej weryfikacji raportów i poprawy błędów.", icon: "revenue-loss" },
+  { title: "Ryzyko Prawne", description: "Niezgodność z wymogami NFZ czy UODO to ryzyko wysokich, dotkliwych kar finansowych.", icon: "legal-risk" },
+  { title: "Nieefektywne Procesy", description: "Niezoptymalizowane procedury administracyjne to gwarancja wypalenia personelu.", icon: "inefficiency" }
 ];
 
 // Używamy danych ze Strapi lub fallback
 const strapiProblems = problemsData && problemsData.length > 0 ? problemsData : fallbackProblems;
 
-// Przekształcamy dane ze Strapi do formatu z komponentami ikon
-const problems = strapiProblems.map(problem => ({
-    title: problem.title,
-    description: problem.description,
-    Icon: iconMap[problem.icon as keyof typeof iconMap] || RevenueLossIcon
-}));
+// Helper: bezpieczne wstrzyknięcie HTML z CKEditora (Strapi)
+const asHtml = (html: string) => DOMPurify.sanitize(html ?? "", { USE_PROFILES: { html: true } });
+
+// Przekształcamy dane ze Strapi do formatu z komponentami ikon (obsługa v5: attributes)
+const problems = strapiProblems.map((problem: any) => {
+  const title = problem?.attributes?.title ?? problem?.title ?? "";
+  const description = problem?.attributes?.description ?? problem?.description ?? "";
+  const iconKey = problem?.attributes?.icon ?? problem?.icon ?? "revenue-loss";
+  return {
+    title,
+    description, // surowy HTML, zrenderujemy niżej
+    Icon: iconMap[iconKey as keyof typeof iconMap] || RevenueLossIcon
+  };
+});
 ---
 
 <section id="problemy" class="py-20 sm:py-32 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto">
-            <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
-                Chaos ma swoją cenę. Płacisz nią codziennie.
-            </h2>
-            <p class="text-lg text-text-muted mb-16 md:mb-24">
-                Identyfikujemy trzy fundamentalne filary ryzyka, które po cichu erodują rentowność i bezpieczeństwo każdej placówki medycznej.
-            </p>
-        </div>
-        
-        <div class="grid lg:grid-cols-3 gap-8">
-            {problems.map((problem) => (
-                <div class="card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-300 hover:border-brand-blue/50 hover:shadow-lg">
-                    <div class="mb-6">
-                        <problem.Icon className="h-10 w-10 text-brand-blue group-hover:scale-110 transition-transform duration-300" />
-                    </div>
-                    <div class="flex flex-col flex-grow">
-                        <h3 class="text-2xl font-bold text-text-primary mb-4">
-                            {problem.title}
-                        </h3>
-                        <p class="text-text-muted leading-relaxed">
-                            {problem.description}
-                        </p>
-                    </div>
-                </div>
-            ))}
-        </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto">
+      <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
+        Chaos ma swoją cenę. Płacisz nią codziennie.
+      </h2>
+      <p class="text-lg text-text-muted mb-16 md:mb-24">
+        Identyfikujemy trzy fundamentalne filary ryzyka, które po cichu erodują rentowność i bezpieczeństwo każdej placówki medycznej.
+      </p>
     </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+      {problems.map((problem) => (
+        <div class="card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-300 hover:border-brand-blue/50 hover:shadow-lg">
+          <div class="mb-6">
+            <problem.Icon className="h-10 w-10 text-brand-blue group-hover:scale-110 transition-transform duration-300" />
+          </div>
+          <div class="flex flex-col flex-grow">
+            <h3 class="text-2xl font-bold text-text-primary mb-4">
+              {problem.title}
+            </h3>
+
+            {/* Tu zmiana: render HTML z CKEditora, zachowując identyczne klasy */}
+            <div
+              class="text-text-muted leading-relaxed"
+              set:html={asHtml(problem.description)}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
 </section>

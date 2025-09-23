@@ -1,6 +1,38 @@
+<!-- src/components/icons/LegalIcon.svelte -->
 <script lang="ts">
-    export let className = "h-8 w-8 text-brand-blue mb-4 group-hover:scale-110 transition-transform duration-300";
+  export let className: string = "";
+  export let decorative: boolean = true;
+  export let title: string = "Prawo";
+
+  const base =
+    "h-8 w-8 text-brand-blue mb-4 shrink-0 transition-transform duration-300 group-hover:scale-110";
 </script>
-<svg class={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 20 20"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role="img"
+  aria-hidden={decorative ? "true" : "false"}
+  aria-label={decorative ? undefined : title}
+  class={`${base} ${className} ${($$props.class as string) || ""}`}
+  {...$$restProps}
+>
+  {#if !decorative}<title>{title}</title>{/if}
+
+  <!-- Kolumna prawa — minimalistyczna -->
+  <!-- Gzyms (góra) -->
+  <path d="M6 7h12" />
+  <!-- Podgzyms -->
+  <path d="M7 9h10" />
+  <!-- Trzy żłobienia/trzony -->
+  <path d="M9 9v8" />
+  <path d="M12 9v8" />
+  <path d="M15 9v8" />
+  <!-- Baza -->
+  <path d="M6 19h12" />
 </svg>

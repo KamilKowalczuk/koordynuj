@@ -1,0 +1,390 @@
+---
+// src/pages/blog/index.astro - BLOG MAIN PAGE WITH FULL CONSISTENCY
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getBlogPosts, getBlogCategories, getBlogPostsCount } from '../../lib/strapi';
+
+// Pagination setup
+const currentPage = 1;
+const postsPerPage = 9;
+
+// Fetch data
+const [blogPosts, categories, totalPosts] = await Promise.all([
+    getBlogPosts(postsPerPage, currentPage),
+    getBlogCategories(),
+    getBlogPostsCount()
+]);
+
+// Fallback data
+const fallbackPosts = [
+    {
+        id: 1,
+        slug: "optymalizacja-rozliczen-nfz-2024",
+        title: "5 najczęstszych błędów w rozliczeniach NFZ i jak ich uniknąć",
+        excerpt: "Praktyczny przewodnik po najważniejszych pułapkach w rozliczeniach z NFZ, które mogą kosztować Twoją placówkę tysiące złotych.",
+        publishedAt: "2024-01-15",
+        author: { name: "Dr Anna Kowalska" },
+        category: { name: "Rozliczenia NFZ" }
+    },
+    {
+        id: 2,
+        slug: "rodo-w-praktyce-medycznej",
+        title: "RODO w praktyce medycznej - kompletna lista dokumentów",
+        excerpt: "Wszystkie dokumenty RODO potrzebne w gabinecie lekarskim w 2024 roku. Gotowe wzory do pobrania.",
+        publishedAt: "2024-01-10",
+        author: { name: "Mgr Piotr Nowak" },
+        category: { name: "Prawo medyczne" }
+    }
+];
+
+const posts = blogPosts && blogPosts.length > 0 ? blogPosts : fallbackPosts;
+const totalPages = Math.ceil((totalPosts || fallbackPosts.length) / postsPerPage);
+
+// Helper functions
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pl-PL', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+};
+
+const createExcerpt = (content: string, length: number = 120) => {
+    if (!content) return "";
+    const plainText = content.replace(/<[^>]*>/g, '');
+    return plainText.length > length ? plainText.substring(0, length) + '...' : plainText;
+};
+---
+
+<MainLayout 
+    title="Blog - Koordynuj Zdrowie | Wiedza o medycynie w praktyce"
+    description="Praktyczne porady, aktualne przepisy i sprawdzone strategie dla placówek medycznych. Bądź na bieżąco z najnowszymi zmianami w systemie zdrowia."
+>
+    <!-- Blog Header Section -->
+    <section class="py-20 sm:py-32 bg-background-light relative overflow-hidden" data-section="blog-header">
+        <!-- Subtle animated background pattern -->
+        <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
+            <div class="blog-header-bg-pattern absolute inset-0"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div data-reveal="fade-up" data-reveal-delay="100">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-text-primary mb-4 tracking-tighter">
+                    Wiedza, która się opłaca
+                </h1>
+                <p class="text-xl text-text-muted max-w-3xl mx-auto">
+                    Praktyczne porady, aktualne przepisy i sprawdzone strategie dla placówek medycznych
+                </p>
+            </div>
+
+            <!-- Categories Filter -->
+            {categories && categories.length > 0 && (
+                <div class="mt-12" data-reveal="fade-up" data-reveal-delay="300">
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <a href="/blog" class="category-pill active">
+                            Wszystkie
+                        </a>
+                        {categories.map((category) => {
+                            const categoryData = category.attributes || category;
+                            return (
+                                <a href={`/blog/category/${categoryData.slug}`} class="category-pill">
+                                    {categoryData.name}
+                                </a>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    </section>
+
+    <!-- Blog Posts Grid -->
+    <section class="py-16 bg-white" data-section="blog-posts">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Posts Grid -->
+            <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-16">
+                {posts.map((post, index) => {
+                    // Strapi v5 - dane bezpośrednio w obiekcie
+                    const author = post.author || { name: "Koordynuj Zdrowie" };
+                    const category = post.category || { name: "Artykuł" };
+                    
+                    return (
+                        <article 
+                            class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10"
+                            data-reveal="slide-up-scale"
+                            data-reveal-delay={100 + (index * 100)}
+                        >
+                            {/* Featured Image */}
+                            <div class="aspect-[16/9] bg-gradient-to-br from-brand-blue/10 to-brand-blue/5 rounded-t-3xl overflow-hidden relative">
+                                {post.featuredImage?.url ? (
+                                    <img 
+                                        src={post.featuredImage.url} 
+                                        alt={post.title}
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <svg class="w-16 h-16 text-brand-blue/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </div>
+                                )}
+                                
+                                <div class="absolute top-4 left-4">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-blue/90 text-white">
+                                        {typeof category === 'string' ? category : category.name}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Card Content */}
+                            <div class="flex flex-col flex-grow p-6">
+                                
+                                {/* Meta Info */}
+                                <div class="flex items-center text-sm text-text-muted mb-3">
+                                    <div class="flex items-center">
+                                        <div class="w-6 h-6 bg-gradient-to-br from-brand-blue to-brand-blue/80 rounded-full flex items-center justify-center mr-2">
+                                            <span class="text-white text-xs font-bold">
+                                                {author.name?.charAt(0) || "K"}
+                                            </span>
+                                        </div>
+                                        <span>{author.name}</span>
+                                    </div>
+                                    <span class="mx-2">•</span>
+                                    <time>{formatDate(post.publishedAt || post.published || post.createdAt)}</time>
+                                </div>
+
+                                {/* Title */}
+                                <h2 class="text-xl font-bold text-text-primary mb-3 group-hover:text-brand-blue/90 transition-colors duration-300 line-clamp-2">
+                                    {post.title}
+                                </h2>
+
+                                {/* Excerpt */}
+                                <p class="text-text-muted leading-relaxed mb-4 flex-grow line-clamp-3">
+                                    {post.excerpt || createExcerpt(post.content || "")}
+                                </p>
+
+                                {/* Read More Link */}
+                                <a 
+                                    href={`/blog/${post.slug}`}
+                                    class="inline-flex items-center text-brand-blue font-semibold mt-auto group-hover:translate-x-1 transition-transform duration-300"
+                                >
+                                    Czytaj więcej
+                                    <svg class="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </article>
+                    );
+                })}
+            </div>
+
+            <!-- Pagination -->
+            {totalPages > 1 && (
+                <div class="flex justify-center" data-reveal="fade-up" data-reveal-delay="500">
+                    <nav class="flex items-center space-x-2">
+                        {currentPage > 1 && (
+                            <a href={`/blog/page/${currentPage - 1}`} class="pagination-btn">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </a>
+                        )}
+                        
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                            <a 
+                                href={pageNum === 1 ? '/blog' : `/blog/page/${pageNum}`}
+                                class={`pagination-btn ${pageNum === currentPage ? 'active' : ''}`}
+                            >
+                                {pageNum}
+                            </a>
+                        ))}
+                        
+                        {currentPage < totalPages && (
+                            <a href={`/blog/page/${currentPage + 1}`} class="pagination-btn">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        )}
+                    </nav>
+                </div>
+            )}
+        </div>
+    </section>
+</MainLayout>
+
+<style>
+    /* === CONSISTENT REVEAL SYSTEM === */
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    [data-reveal="slide-up-scale"] {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    
+    [data-reveal].revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    [data-reveal="slide-up-scale"].revealed {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* === BLOG CARDS - IDENTICAL TO OTHER SECTIONS === */
+    .blog-card {
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .blog-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, rgba(0, 169, 224, 0.05), rgba(0, 169, 224, 0.02));
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+    
+    .blog-card:hover::before {
+        opacity: 1;
+    }
+    
+    .blog-card:hover {
+        transform: translateY(-4px);
+    }
+
+    /* === CATEGORY PILLS === */
+    .category-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        border: 2px solid #E2E8F0;
+        color: #64748B;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .category-pill:hover {
+        border-color: #00A9E0;
+        color: #00A9E0;
+        transform: translateY(-1px);
+    }
+    
+    .category-pill.active {
+        background-color: #00A9E0;
+        border-color: #00A9E0;
+        color: white;
+    }
+
+    /* === PAGINATION === */
+    .pagination-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        border: 2px solid #E2E8F0;
+        color: #64748B;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination-btn:hover {
+        border-color: #00A9E0;
+        color: #00A9E0;
+        transform: translateY(-1px);
+    }
+    
+    .pagination-btn.active {
+        background-color: #00A9E0;
+        border-color: #00A9E0;
+        color: white;
+    }
+
+    /* === LINE CLAMP === */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* === BACKGROUND PATTERN === */
+    .blog-header-bg-pattern {
+        background-image: 
+            radial-gradient(circle at 25% 25%, rgba(0, 169, 224, 0.08) 1px, transparent 1px),
+            radial-gradient(circle at 75% 75%, rgba(0, 169, 224, 0.06) 1px, transparent 1px);
+        background-size: 100px 100px, 150px 150px;
+        animation: patternDrift 20s linear infinite;
+    }
+
+    @keyframes patternDrift {
+        0% { background-position: 0% 0%, 0% 0%; }
+        100% { background-position: 100% 100%, -100% 100%; }
+    }
+
+    /* === ACCESSIBILITY === */
+    .no-js [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+        [data-reveal], .blog-card, .blog-header-bg-pattern {
+            animation: none !important;
+            transition: none !important;
+        }
+        [data-reveal] {
+            opacity: 1;
+            transform: none;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sections = document.querySelectorAll('[data-section]');
+        
+        sections.forEach(section => {
+            setTimeout(() => {
+                const hiddenElements = section.querySelectorAll('[data-reveal]:not(.revealed)');
+                hiddenElements.forEach(el => el.classList.add('revealed'));
+            }, 2000);
+
+            const revealElements = section.querySelectorAll('[data-reveal]');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const delay = entry.target.getAttribute('data-reveal-delay') || '0';
+                        setTimeout(() => {
+                            entry.target.classList.add('revealed');
+                        }, parseInt(delay, 10));
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '-5%' });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+        });
+    });
+</script>

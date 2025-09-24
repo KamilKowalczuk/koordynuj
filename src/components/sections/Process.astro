@@ -1,5 +1,5 @@
 ---
-// src/components/sections/Process.astro - WERSJA POPRAWIONA I USZCZELNIONA
+// src/components/sections/Process.astro - ENHANCED WITH CONSISTENT ANIMATIONS
 import InteractiveTimeline from '../ui/InteractiveTimeline.svelte';
 
 // POPRAWKA: Oto pełna, poprawna składniowo definicja 'steps'
@@ -49,7 +49,13 @@ const steps = [
 ];
 ---
 
-<section id="proces" class="py-20 sm:py-32 bg-background-light relative overflow-hidden">
+<section id="proces" class="py-20 sm:py-32 bg-background-light relative overflow-hidden" data-section="process">
+    <!-- Subtle animated background pattern - consistent with other sections -->
+    <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
+        <div class="process-bg-pattern absolute inset-0"></div>
+    </div>
+
+    <!-- Enhanced process flow background -->
     <div class="absolute inset-0 opacity-5">
         <svg class="w-full h-full" viewBox="0 0 1200 800">
             <defs>
@@ -65,7 +71,8 @@ const steps = [
     </div>
 
     <div class="relative z-10 max-w-5xl mx-auto px-4">
-        <div class="text-center mb-16 animate-reveal">
+        <!-- Enhanced header with reveal animation -->
+        <div class="text-center mb-16" data-reveal="fade-up" data-reveal-delay="100">
             <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
                 Trzy kroki do pełnej optymalizacji.
             </h2>
@@ -74,29 +81,38 @@ const steps = [
             </p>
         </div>
 
-        <InteractiveTimeline {steps} client:load />
+        <!-- Enhanced timeline with reveal animation -->
+        <div data-reveal="slide-up-scale" data-reveal-delay="300">
+            <InteractiveTimeline {steps} client:load />
+        </div>
 
-        <div class="mt-16 bg-gradient-to-r from-brand-blue/5 to-background-muted p-8 rounded-2xl animate-reveal">
-            <div class="text-center">
-                <h3 class="text-xl font-semibold text-text-primary mb-4">
-                    Gotowy na rozpoczęcie transformacji?
-                </h3>
-                <p class="text-text-muted mb-6">
-                    Pierwsza konsultacja jest <span class="font-semibold text-brand-blue">bezpłatna</span>. 
-                    Ocenimy potencjał Twojej placówki i przedstawimy konkretny plan działania.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="#kontakt" class="btn-primary inline-flex items-center">
-                        Zacznijmy współpracę
-                        <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                        </svg>
-                    </a>
-                    <div class="flex items-center text-text-muted">
-                        <svg class="w-5 h-5 mr-2 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span>Odpowiedź w ciągu 24h</span>
+        <!-- Enhanced CTA section -->
+        <div class="mt-16" data-reveal="slide-up-scale" data-reveal-delay="500">
+            <div class="cta-card bg-gradient-to-r from-brand-blue/5 to-background-muted p-8 rounded-2xl transition-all duration-500 hover:shadow-lg hover:shadow-brand-blue/5 hover:from-brand-blue/8 hover:to-background-muted relative overflow-hidden">
+                <!-- Subtle background decoration -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-brand-blue/10 to-transparent rounded-full transform translate-x-16 -translate-y-16"></div>
+                
+                <div class="text-center relative z-10">
+                    <h3 class="text-xl font-semibold text-text-primary mb-4 group-hover:text-brand-blue/90 transition-colors duration-300">
+                        Gotowy na rozpoczęcie transformacji?
+                    </h3>
+                    <p class="text-text-muted mb-6">
+                        Pierwsza konsultacja jest <span class="font-semibold text-brand-blue">bezpłatna</span>. 
+                        Ocenimy potencjał Twojej placówki i przedstawimy konkretny plan działania.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <a href="#kontakt" class="btn-primary inline-flex items-center group">
+                            Zacznijmy współpracę
+                            <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </a>
+                        <div class="flex items-center text-text-muted time-guarantee">
+                            <svg class="w-5 h-5 mr-2 text-brand-blue transition-transform hover:rotate-12 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Odpowiedź w ciągu 24h</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -105,6 +121,86 @@ const steps = [
 </section>
 
 <style>
+    /* === CONSISTENT REVEAL SYSTEM FROM OTHER SECTIONS === */
+    
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    [data-reveal="slide-up-scale"] {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    
+    [data-reveal].revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    [data-reveal="slide-up-scale"].revealed {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* === ENHANCED CTA CARD === */
+    
+    .cta-card {
+        position: relative;
+        cursor: default;
+    }
+    
+    .cta-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, rgba(0, 169, 224, 0.02), transparent);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+    
+    .cta-card:hover::before {
+        opacity: 1;
+    }
+
+    /* === SUBTLE BACKGROUND PATTERN === */
+    .process-bg-pattern {
+        background-image: 
+            radial-gradient(circle at 25% 20%, rgba(0, 169, 224, 0.12) 1px, transparent 1px),
+            radial-gradient(circle at 75% 80%, rgba(0, 169, 224, 0.08) 1px, transparent 1px),
+            radial-gradient(circle at 50% 50%, rgba(0, 169, 224, 0.10) 1px, transparent 1px);
+        background-size: 150px 150px, 200px 200px, 175px 175px;
+        animation: patternDrift 30s linear infinite;
+    }
+
+    /* === ENHANCED CTA BUTTON === */
+    .btn-primary {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* .btn-primary::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15));
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+        border-radius: inherit;
+    }
+    
+    .btn-primary:hover::before {
+        transform: translateX(100%);
+    } */
+
+    /* === TIME GUARANTEE ENHANCEMENT === */
+    .time-guarantee:hover .text-brand-blue {
+        animation: clockTick 1s ease-in-out;
+    }
+
+    /* === ORIGINAL PROCESS ANIMATIONS (PRESERVED) === */
     @keyframes process-flow {
         from { stroke-dasharray: 1200; stroke-dashoffset: 1200; }
         to { stroke-dasharray: 1200; stroke-dashoffset: 0; }
@@ -124,31 +220,104 @@ const steps = [
     .animate-pulse-process-delay { animation: pulse-process 3s ease-in-out infinite 1s; }
     .animate-pulse-process-delay-2 { animation: pulse-process 3s ease-in-out infinite 2s; }
 
-    /* Animacja wejścia dla elementów sekcji */
-    .animate-reveal {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    /* === NEW KEYFRAME ANIMATIONS === */
+    @keyframes patternDrift {
+        0% {
+            background-position: 0% 0%, 0% 0%, 0% 0%;
+        }
+        100% {
+            background-position: 100% 100%, -100% 100%, 50% -100%;
+        }
     }
-    .animate-reveal.is-visible {
-        opacity: 1;
-        transform: translateY(0);
+    
+    @keyframes clockTick {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-15deg); }
+        75% { transform: rotate(15deg); }
+    }
+
+    /* === ACCESSIBILITY & PERFORMANCE === */
+    
+    /* Fallback: show elements if JS doesn't load */
+    .no-js [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+        [data-reveal],
+        .cta-card,
+        .process-bg-pattern,
+        .btn-primary,
+        .time-guarantee {
+            animation: none !important;
+            transition: none !important;
+        }
+        
+        [data-reveal] {
+            opacity: 1;
+            transform: none;
+        }
+        
+        .animate-process-flow,
+        .animate-pulse-process,
+        .animate-pulse-process-delay,
+        .animate-pulse-process-delay-2 {
+            animation: none !important;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .process-bg-pattern {
+            display: none; /* Better mobile performance */
+        }
     }
 </style>
 
 <script>
+    // PROCESS SECTION ANIMATION CONTROLLER
     document.addEventListener('DOMContentLoaded', () => {
-        const observer = new IntersectionObserver((entries) => {
+        const processSection = document.querySelector('[data-section="process"]') as HTMLElement;
+        if (!processSection) return;
+
+        // FALLBACK: Show elements after 2s if they're still hidden
+        setTimeout(() => {
+            const hiddenElements = processSection.querySelectorAll('[data-reveal]:not(.revealed)');
+            hiddenElements.forEach(el => el.classList.add('revealed'));
+        }, 2000);
+
+        // 1. REVEAL SYSTEM - SAME AS OTHER SECTIONS
+        const revealElements = processSection.querySelectorAll('[data-reveal]');
+        
+        const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
+                    const delay = entry.target.getAttribute('data-reveal-delay') || '0';
+                    setTimeout(() => {
+                        entry.target.classList.add('revealed');
+                    }, parseInt(delay, 10));
+                    revealObserver.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.animate-reveal').forEach(el => {
-            observer.observe(el);
+        }, { 
+            threshold: 0.1,
+            rootMargin: '-5%'
         });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // 2. ENHANCED CTA INTERACTION
+        const ctaCard = processSection.querySelector('.cta-card') as HTMLElement;
+        if (ctaCard) {
+            ctaCard.addEventListener('mouseenter', () => {
+                ctaCard.style.transform = 'translateY(-2px) scale(1.01)';
+            });
+            
+            ctaCard.addEventListener('mouseleave', () => {
+                ctaCard.style.transform = '';
+            });
+        }
+
+        console.log('⚙️ Process section enhanced animations loaded');
     });
 </script>

@@ -11,20 +11,24 @@
     { href: '#proces', label: 'Proces' },
   ];
 
-  function handleScroll() {
-    isScrolled = window.scrollY > 50;
-  }
+  function handleScroll() { isScrolled = window.scrollY > 50; }
   function toggleMenu() { isOpen = !isOpen; }
   function closeMenu() { isOpen = false; }
 
-  // ✅ Klik logo: zawsze do "/" i odśwież stronę, jeśli już jesteśmy na "/"
+  // ✅ Klik logo bez <a> wrappera — działa nawet jeśli slot ma własny link
   function handleLogoClick(event: MouseEvent) {
     event.preventDefault();
-    isOpen = false; // zamknij mobilne menu
+    isOpen = false;
     if (window.location.pathname === '/') {
       window.location.reload();
     } else {
       window.location.href = '/';
+    }
+  }
+  function handleLogoKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleLogoClick(new MouseEvent('click'));
     }
   }
 
@@ -42,11 +46,16 @@
   class:py-6={!isScrolled}
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-    <!-- 🔧 ZMIANA TYLKO TUTAJ -->
-    <div class="flex-shrink-0">
-      <a href="/" aria-label="Przejdź na stronę główną" on:click={handleLogoClick} class="inline-flex items-center">
-        <slot name="logo" />
-      </a>
+    <!-- 🔧 TUTAJ ZMIANA: brak <a>, tylko clickable kontener -->
+    <div 
+      class="flex-shrink-0 inline-flex items-center cursor-pointer"
+      role="link"
+      aria-label="Przejdź na stronę główną"
+      tabindex="0"
+      on:click={handleLogoClick}
+      on:keydown={handleLogoKeydown}
+    >
+      <slot name="logo" />
     </div>
 
     <nav class="hidden md:flex items-center space-x-8">
@@ -55,17 +64,11 @@
           {link.label}
         </a>
       {/each}
-      <a href="#kontakt" class="btn-primary !px-6 !py-2 !text-base">
-        Kontakt
-      </a>
+      <a href="#kontakt" class="btn-primary !px-6 !py-2 !text-base">Kontakt</a>
     </nav>
 
     <div class="md:hidden">
-      <button 
-        on:click={toggleMenu} 
-        class="text-text-primary focus:outline-none"
-        aria-label="Otwórz menu"
-      >
+      <button on:click={toggleMenu} class="text-text-primary focus:outline-none" aria-label="Otwórz menu">
         <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           {#if !isOpen}
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
@@ -84,9 +87,7 @@
           {link.label}
         </a>
       {/each}
-      <a href="#kontakt" class="btn-primary !text-2xl !px-10 !py-4" on:click={closeMenu}>
-        Kontakt
-      </a>
+      <a href="#kontakt" class="btn-primary !text-2xl !px-10 !py-4" on:click={closeMenu}>Kontakt</a>
     </div>
   {/if}
 </header>

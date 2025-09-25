@@ -69,23 +69,36 @@ const themeColor = "#00A9E0";
 		
 		<!-- Smooth scroll behavior -->
 		<script>
+			  // Funkcja wymuszająca start od góry (ale NIE, gdy wchodzimy z #kotwicą)
+			const scrollTopIfNoHash = () => {
+				if (!location.hash) {
+				// dwukrotny rAF, żeby przebić się po reflowach
+				requestAnimationFrame(() => {
+					requestAnimationFrame(() => {
+					window.scrollTo(0, 0);
+					});
+				});
+				}
+			};
+
+			// Normalne załadowanie
+			window.addEventListener('load', scrollTopIfNoHash);
+
+			// Powrót z BFCache (np. back/forward) też potrafi przywrócić scroll
+			window.addEventListener('pageshow', (e) => {
+				if (e.persisted) scrollTopIfNoHash();
+			});
 			// Płynne przewijanie do sekcji
 			document.addEventListener('DOMContentLoaded', () => {
-				// Obsługa linków do sekcji
 				const links = document.querySelectorAll('a[href^="#"]');
 				links.forEach(link => {
-					link.addEventListener('click', (e) => {
-						e.preventDefault();
-						const targetId = link.getAttribute('href')?.substring(1);
-						const targetElement = document.getElementById(targetId || '');
-						
-						if (targetElement) {
-							targetElement.scrollIntoView({
-								behavior: 'smooth',
-								block: 'start'
-							});
-						}
-					});
+				link.addEventListener('click', (e) => {
+					const targetId = link.getAttribute('href')?.substring(1);
+					const targetElement = targetId ? document.getElementById(targetId) : null;
+					if (!targetElement) return; // brak elementu -> zostaw default
+					e.preventDefault();
+					targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				});
 				});
 			});
 		</script>

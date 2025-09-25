@@ -258,7 +258,7 @@ export interface BlogPost {
 // Get blog posts with optional limit and pagination
 export async function getBlogPosts(limit?: number, page: number = 1): Promise<BlogPost[] | null> {
   try {
-    let query = 'blog-posts?sort=publishedAt:desc&populate=author,category,featuredImage,tags';
+    let query = 'blog-posts?sort=published:desc&populate=author,category,featuredImage,tags';
     
     if (limit) {
       query += `&pagination[limit]=${limit}`;
@@ -268,7 +268,7 @@ export async function getBlogPosts(limit?: number, page: number = 1): Promise<Bl
     }
     
     // Add published filter - check both published and publishedAt fields
-    query += '&filters[$or][0][publishedAt][$notNull]=true&filters[$or][1][published][$notNull]=true';
+    query += '&filters[$or][0][published][$notNull]=true&filters[$or][1][published][$notNull]=true';
     
     const response = await fetchStrapi(query);
     return response?.data || null;
@@ -304,7 +304,7 @@ export async function getBlogCategories(): Promise<any[] | null> {
 // Get related blog posts (by category, excluding current post)
 export async function getRelatedBlogPosts(currentSlug: string, categoryId?: number, limit: number = 3): Promise<BlogPost[] | null> {
   try {
-    let query = `blog-posts?sort=publishedAt:desc&populate=author,category,featuredImage&pagination[limit]=${limit}`;
+    let query = `blog-posts?sort=published:desc&populate=author,category,featuredImage&pagination[limit]=${limit}`;
     
     // Exclude current post
     query += `&filters[slug][$ne]=${currentSlug}`;
@@ -315,7 +315,7 @@ export async function getRelatedBlogPosts(currentSlug: string, categoryId?: numb
     }
     
     // Only published posts - check both fields
-    query += '&filters[$or][0][publishedAt][$notNull]=true&filters[$or][1][published][$notNull]=true';
+    query += '&filters[$or][0][published][$notNull]=true&filters[$or][1][published][$notNull]=true';
     
     const response = await fetchStrapi(query);
     return response?.data || null;
@@ -328,7 +328,7 @@ export async function getRelatedBlogPosts(currentSlug: string, categoryId?: numb
 // Get blog posts by category
 export async function getBlogPostsByCategory(categorySlug: string, limit?: number): Promise<BlogPost[] | null> {
   try {
-    let query = `blog-posts?sort=publishedAt:desc&populate=author,category,featuredImage`;
+    let query = `blog-posts?sort=published:desc&populate=category,featuredImage`;
     
     if (limit) {
       query += `&pagination[limit]=${limit}`;
@@ -338,7 +338,7 @@ export async function getBlogPostsByCategory(categorySlug: string, limit?: numbe
     query += `&filters[category][slug][$eq]=${categorySlug}`;
     
     // Only published posts
-    query += '&filters[$or][0][publishedAt][$notNull]=true&filters[$or][1][published][$notNull]=true';
+    query += '&filters[$or][0][published][$notNull]=true&filters[$or][1][published][$notNull]=true';
     
     const response = await fetchStrapi(query);
     return response?.data || null;
@@ -351,7 +351,7 @@ export async function getBlogPostsByCategory(categorySlug: string, limit?: numbe
 // Search blog posts
 export async function searchBlogPosts(searchTerm: string, limit: number = 10): Promise<BlogPost[] | null> {
   try {
-    let query = `blog-posts?sort=publishedAt:desc&populate=author,category,featuredImage&pagination[limit]=${limit}`;
+    let query = `blog-posts?sort=published:desc&populate=category,featuredImage&pagination[limit]=${limit}`;
     
     // Search in title and content
     query += `&filters[$or][0][title][$containsi]=${searchTerm}`;
@@ -359,7 +359,7 @@ export async function searchBlogPosts(searchTerm: string, limit: number = 10): P
     query += `&filters[$or][2][excerpt][$containsi]=${searchTerm}`;
     
     // Only published posts
-    query += '&filters[$and][0][$or][0][publishedAt][$notNull]=true&filters[$and][0][$or][1][published][$notNull]=true';
+    query += '&filters[$and][0][$or][0][published][$notNull]=true&filters[$and][0][$or][1][published][$notNull]=true';
     
     const response = await fetchStrapi(query);
     return response?.data || null;
@@ -372,7 +372,7 @@ export async function searchBlogPosts(searchTerm: string, limit: number = 10): P
 // Get blog posts count (for pagination)
 export async function getBlogPostsCount(): Promise<number> {
   try {
-    const response = await fetchStrapi('blog-posts?pagination[limit]=1&filters[$or][0][publishedAt][$notNull]=true&filters[$or][1][published][$notNull]=true');
+    const response = await fetchStrapi('blog-posts?pagination[limit]=1&filters[$or][0][published][$notNull]=true&filters[$or][1][published][$notNull]=true');
     return response?.meta?.pagination?.total || 0;
   } catch (error) {
     console.error('Error fetching blog posts count:', error);

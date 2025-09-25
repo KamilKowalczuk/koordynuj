@@ -190,7 +190,6 @@
 	@media (prefers-reduced-motion: reduce) {
 		:global(.timeline-card),
 		.icon-element,
-		.duration-badge,
 		.detail-item {
 			animation: none !important;
 			transition: none !important;

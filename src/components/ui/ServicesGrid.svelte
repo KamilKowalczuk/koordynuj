@@ -174,7 +174,6 @@
 	
 	@media (prefers-reduced-motion: reduce) {
 		.service-card,
-		.icon-element,
 		.number-element {
 			animation: none !important;
 			transition: none !important;

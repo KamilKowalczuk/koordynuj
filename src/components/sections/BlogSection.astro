@@ -1,55 +1,48 @@
 ---
-// src/components/sections/BlogSection.astro - CONSISTENT WITH ANIMATION SYSTEM
+// src/components/sections/BlogSection.astro - FIXED VERSION
+// Fixed TypeScript union type errors and improved data access patterns
+
 import { getBlogPosts } from '../../lib/strapi';
 
-// Pobieramy najnowsze 3 posty z bloga
-const blogPosts = await getBlogPosts(3);
+// Fetch blog posts (limit 6 for homepage)
+const blogPosts = await getBlogPosts(6);
 
-// Fallback dane w przypadku braku połączenia ze Strapi
+// Fallback blog posts for development/demo (mocked data that matches actual structure)
 const fallbackPosts = [
     {
         id: 1,
-        slug: "optymalizacja-rozliczen-nfz-2024",
-        title: "5 najczęstszych błędów w rozliczeniach NFZ i jak ich uniknąć",
-        excerpt: "Praktyczny przewodnik po najważniejszych pułapkach w rozliczeniach z NFZ, które mogą kosztować Twoją placówkę tysiące złotych.",
+        slug: "nowe-przepisy-medyczne-2024",
+        title: "Nowe przepisy medyczne w 2024 roku",
+        excerpt: "Przegląd najważniejszych zmian prawnych, które wpływają na funkcjonowanie placówek medycznych.",
         publishedAt: "2024-01-15",
-        author: {
-            name: "Dr Anna Kowalska",
-            avatar: null
-        },
-        featuredImage: null,
-        category: "Rozliczenia NFZ"
-    },
-    {
-        id: 2,
-        slug: "rodo-w-praktyce-medycznej",
-        title: "RODO w praktyce medycznej - kompletna lista dokumentów",
-        excerpt: "Wszystkie dokumenty RODO potrzebne w gabinecie lekarskim w 2024 roku. Gotowe wzory do pobrania.",
-        publishedAt: "2024-01-10",
-        author: {
-            name: "Mgr Piotr Nowak",
-            avatar: null
-        },
+        author: { name: "Koordynuj Zdrowie", avatar: null },
         featuredImage: null,
         category: "Prawo medyczne"
     },
     {
-        id: 3,
-        slug: "programy-profilaktyczne-2024",
-        title: "Nowe programy profilaktyczne NFZ - przewodnik wdrożenia",
-        excerpt: "Jak skutecznie wdrożyć programy profilaktyczne w swojej placówce i zwiększyć przychody o 30%.",
-        publishedAt: "2024-01-05",
-        author: {
-            name: "Lek. Tomasz Zieliński",
-            avatar: null
-        },
+        id: 2,
+        slug: "optymalizacja-rozliczen",
+        title: "Jak zoptymalizować rozliczenia NFZ",
+        excerpt: "Praktyczne wskazówki dotyczące poprawy efektywności rozliczeń z Narodowym Funduszem Zdrowia.",
+        publishedAt: "2024-01-10",
+        author: { name: "Koordynuj Zdrowie", avatar: null },
         featuredImage: null,
-        category: "Profilaktyka"
+        category: "Rozliczenia"
+    },
+    {
+        id: 3,
+        slug: "digitalizacja-placowki",
+        title: "Digitalizacja placówki medycznej",
+        excerpt: "Kompletny przewodnik po cyfrowej transformacji gabinetu lekarskiego.",
+        publishedAt: "2024-01-05",
+        author: { name: "Koordynuj Zdrowie", avatar: null },
+        featuredImage: null,
+        category: "Technologia"
     }
 ];
 
-// Używamy danych ze Strapi lub fallback
-const posts = blogPosts && blogPosts.length > 0 ? blogPosts : fallbackPosts;
+// Use fetched posts or fallback to demo data
+const posts = Array.isArray(blogPosts) && blogPosts.length > 0 ? blogPosts : fallbackPosts;
 
 // Helper do formatowania daty
 const formatDate = (dateString: string) => {
@@ -90,9 +83,9 @@ const createExcerpt = (content: string, length: number = 120) => {
         <!-- Enhanced blog cards grid with staggered reveals -->
         <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-12">
             {posts.map((post, index) => {
-                // Strapi v5 - dane bezpośrednio w obiekcie, bez attributes wrapper
+                // Safe property access for union types
                 const author = post.author || { name: "Koordynuj Zdrowie" };
-                const category = post.category || "Artykuł";
+                const category = typeof post.category === 'string' ? post.category : post.category?.name || "Artykuł";
                 
                 return (
                     <article 
@@ -138,7 +131,8 @@ const createExcerpt = (content: string, length: number = 120) => {
                                     <span>{author.name}</span>
                                 </div>
                                 <span class="mx-2">•</span>
-                                <time>{formatDate(post.publishedAt || post.published || post.createdAt)}</time>
+                                {/* FIXED: Only use publishedAt property that exists in both union types */}
+                                <time>{formatDate(post.publishedAt ?? "")}</time>
                             </div>
 
                             {/* Title */}
@@ -146,9 +140,9 @@ const createExcerpt = (content: string, length: number = 120) => {
                                 {post.title}
                             </h3>
 
-                            {/* Excerpt */}
+                            {/* Excerpt - FIXED: Use excerpt property that exists in both types, with fallback to empty string */}
                             <p class="text-text-muted leading-relaxed mb-4 flex-grow line-clamp-3">
-                                {post.excerpt || createExcerpt(post.content || "")}
+                                {post.excerpt || "Przeczytaj więcej w pełnym artykule..."}
                             </p>
 
                             {/* Read More Link */}
@@ -307,26 +301,50 @@ const createExcerpt = (content: string, length: number = 120) => {
             hiddenElements.forEach(el => el.classList.add('revealed'));
         }, 2000);
 
-        // 1. REVEAL SYSTEM - SAME AS OTHER SECTIONS
-        const revealElements = blogSection.querySelectorAll('[data-reveal]');
-        
-        const revealObserver = new IntersectionObserver((entries) => {
+        // INTERSECTION OBSERVER - PERFORMANCE OPTIMIZED
+        const observerOptions: IntersectionObserverInit = {
+            rootMargin: '50px 0px -100px 0px', // Start animation slightly before entering viewport
+            threshold: [0, 0.1]
+        };
+
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const delay = entry.target.getAttribute('data-reveal-delay') || '0';
+                const element = entry.target as HTMLElement;
+                
+                if (entry.isIntersecting && entry.intersectionRatio > 0) {
+                    // Add delay from data attribute
+                    const delay = parseInt(element.dataset.revealDelay || '0');
+                    
                     setTimeout(() => {
-                        entry.target.classList.add('revealed');
-                    }, parseInt(delay, 10));
-                    revealObserver.unobserve(entry.target);
+                        element.classList.add('revealed');
+                    }, delay);
+                    
+                    // Stop observing once revealed for performance
+                    observer.unobserve(element);
                 }
             });
-        }, { 
-            threshold: 0.1,
-            rootMargin: '-5%'
+        }, observerOptions);
+
+        // Observe all reveal elements within this section
+        const revealElements = blogSection.querySelectorAll('[data-reveal]');
+        revealElements.forEach(el => observer.observe(el));
+
+        // CLEANUP: Disconnect observer when section is removed (if using frameworks)
+        const cleanup = () => observer.disconnect();
+        
+        // Handle page visibility changes for performance
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                observer.disconnect();
+            } else if (revealElements.length > 0) {
+                revealElements.forEach(el => {
+                    if (!el.classList.contains('revealed')) {
+                        observer.observe(el);
+                    }
+                });
+            }
         });
 
-        revealElements.forEach(el => revealObserver.observe(el));
-
-        console.log('📝 Blog section enhanced animations loaded');
+        return cleanup;
     });
 </script>

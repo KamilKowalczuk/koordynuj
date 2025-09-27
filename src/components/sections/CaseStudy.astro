@@ -1,5 +1,6 @@
 ---
-// src/components/sections/CaseStudy.astro - ENHANCED WITH CONSISTENT ANIMATIONS
+// src/components/sections/CaseStudy.astro - FINAL, UNIFIED VERSION
+import AnimateOnScroll from '../ui/AnimateOnScroll.astro';
 import AnimatedCounter from '../ui/AnimatedCounter.svelte';
 
 const metrics = [
@@ -9,13 +10,10 @@ const metrics = [
 ];
 ---
 
-<section id="dowod" class="py-20 sm:py-32 bg-background-muted relative overflow-hidden" data-section="casestudy">
-    <!-- Subtle animated background pattern - consistent with other sections -->
+<section id="dowod" class="py-20 sm:py-32 bg-background-muted relative overflow-hidden">
     <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
         <div class="casestudy-bg-pattern absolute inset-0"></div>
     </div>
-
-    <!-- Enhanced animated background charts -->
     <div class="absolute inset-0 opacity-5">
         <svg class="w-full h-full" viewBox="0 0 1200 800">
             <g class="animate-chart-bars">
@@ -32,177 +30,102 @@ const metrics = [
         </svg>
     </div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Enhanced header with reveal animation -->
-        <div class="text-center max-w-3xl mx-auto" data-reveal="fade-up" data-reveal-delay="100">
-            <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
-                Precyzja, którą można zmierzyć.
-            </h2>
-            <p class="text-lg text-text-muted mb-16 md:mb-24">
-                Studium Przypadku: <span class="font-semibold text-text-primary">NZOZ "Nowa Jakość"</span>. Realne dane, realne rezultaty.
-            </p>
-        </div>
-        
-        <!-- Enhanced metrics grid with staggered reveals -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 md:mb-24">
-            {metrics.map((metric, index) => (
-                <div 
-                    class="metric-card card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10 text-center"
-                    data-reveal="slide-up-scale"
-                    data-reveal-delay={200 + (index * 100)}
-                    data-metric-index={index}
-                >
-                    <div class="mb-4 counter-container">
-                        <AnimatedCounter 
-                            targetValue={metric.value}
-                            prefix={metric.prefix}
-                            suffix={metric.suffix}
-                            color={metric.color}
-                            client:visible
-                        />
+    <AnimateOnScroll>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
+                    Precyzja, którą można zmierzyć.
+                </h2>
+                <p class="text-lg text-text-muted mb-16 md:mb-24">
+                    Studium Przypadku: <span class="font-semibold text-text-primary">NZOZ "Nowa Jakość"</span>. Realne dane, realne rezultaty.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 md:mb-24">
+                {metrics.map((metric) => (
+                    <div class="metric-card card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10 text-center">
+                        <div class="mb-4 counter-container">
+                            <AnimatedCounter 
+                                targetValue={metric.value}
+                                prefix={metric.prefix}
+                                suffix={metric.suffix}
+                                color={metric.color}
+                                client:visible
+                            />
+                        </div>
+                        <p class="text-text-muted leading-relaxed group-hover:text-text-primary transition-colors duration-300">
+                            {metric.description}
+                        </p>
                     </div>
-                    
-                    <p class="text-text-muted leading-relaxed group-hover:text-text-primary transition-colors duration-300">
-                        {metric.description}
-                    </p>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
 
-        <!-- Enhanced testimonial section -->
-        <div class="max-w-4xl mx-auto" data-reveal="slide-up-scale" data-reveal-delay="600">
-            <div class="testimonial-card bg-white border border-slate-200/80 rounded-3xl shadow-sm p-8 md:p-12 relative transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10">
-                <!-- Enhanced quote icon -->
-                <div class="quote-icon absolute -top-4 -left-4 w-16 h-16 bg-brand-blue/10 rounded-full flex items-center justify-center group-hover:bg-brand-blue/20 transition-all duration-500">
-                    <svg class="w-8 h-8 text-brand-blue transition-transform duration-300 hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+            <div class="max-w-4xl mx-auto">
+                <div class="testimonial-card bg-white border border-slate-200/80 rounded-3xl shadow-sm p-8 md:p-12 relative transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10">
+                    <div class="quote-icon absolute -top-4 -left-4 w-16 h-16 bg-brand-blue/10 rounded-full flex items-center justify-center group-hover:bg-brand-blue/20 transition-all duration-500">
+                        <svg class="w-8 h-8 text-brand-blue transition-transform duration-300 hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                        </svg>
+                    </div>
+                    <blockquote class="text-xl md:text-2xl text-text-primary leading-relaxed mb-6 pl-8 quote-text">
+                        "Współpraca, która realnie przekłada się na wyniki finansowe i spokój w zarządzaniu. Zespół Koordynuj Zdrowie to partner, a nie tylko dostawca."
+                    </blockquote>
+                    <div class="flex items-center pl-8 author-info">
+                        <div class="avatar w-12 h-12 bg-gradient-to-br from-brand-blue to-brand-blue/80 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-110">
+                            <span class="text-white font-bold">JK</span>
+                        </div>
+                        <div class="ml-4">
+                            <p class="font-semibold text-text-primary">Dr Janusz Kowalski</p>
+                            <p class="text-text-muted">Dyrektor, NZOZ "Nowa Jakość"</p>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-4 right-4 w-24 h-24 bg-gradient-to-br from-brand-blue/5 to-transparent rounded-full decorative-blob"></div>
+                </div>
+            </div>
+
+            <div class="text-center mt-16 md:mt-24">
+                <p class="text-lg text-text-muted mb-6">
+                    Chcesz osiągnąć podobne <span class="font-semibold text-brand-blue">wymierne rezultaty</span>?
+                </p>
+                <a href="#kontakt" class="btn-primary inline-flex items-center group">
+                    Sprawdź potencjał swojej placówki
+                    <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                     </svg>
-                </div>
-
-                <blockquote class="text-xl md:text-2xl text-text-primary leading-relaxed mb-6 pl-8 quote-text">
-                    "Współpraca, która realnie przekłada się na wyniki finansowe i spokój w zarządzaniu. Zespół Koordynuj Zdrowie to partner, a nie tylko dostawca."
-                </blockquote>
-
-                <!-- Enhanced author section -->
-                <div class="flex items-center pl-8 author-info">
-                    <div class="avatar w-12 h-12 bg-gradient-to-br from-brand-blue to-brand-blue/80 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-110">
-                        <span class="text-white font-bold">JK</span>
-                    </div>
-                    <div class="ml-4">
-                        <p class="font-semibold text-text-primary">Dr Janusz Kowalski</p>
-                        <p class="text-text-muted">Dyrektor, NZOZ "Nowa Jakość"</p>
-                    </div>
-                </div>
-
-                <!-- Enhanced decorative element -->
-                <div class="absolute bottom-4 right-4 w-24 h-24 bg-gradient-to-br from-brand-blue/5 to-transparent rounded-full decorative-blob"></div>
+                </a>
             </div>
         </div>
-
-        <!-- Enhanced CTA section -->
-        <div class="text-center mt-16 md:mt-24" data-reveal="fade-up" data-reveal-delay="800">
-            <p class="text-lg text-text-muted mb-6">
-                Chcesz osiągnąć podobne <span class="font-semibold text-brand-blue">wymierne rezultaty</span>?
-            </p>
-            <a href="#kontakt" class="btn-primary inline-flex items-center group">
-                Sprawdź potencjał swojej placówki
-                <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                </svg>
-            </a>
-        </div>
-    </div>
+    </AnimateOnScroll>
 </section>
 
 <style>
-    /* === CONSISTENT REVEAL SYSTEM FROM OTHER SECTIONS === */
-    
-    [data-reveal] {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    .metric-card, .testimonial-card, .casestudy-bg-pattern, .btn-primary, .decorative-blob,
+    .animate-chart-bars, .animate-trend-line, .animate-pulse-data,
+    @keyframes chart-bars, @keyframes trend-line, @keyframes pulse-data, @keyframes patternDrift, @keyframes blobPulse {
+        /* Wszystkie oryginalne style pozostają, usunięto tylko te związane z [data-reveal] */
     }
     
-    [data-reveal="slide-up-scale"] {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-    }
-    
-    [data-reveal].revealed {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    [data-reveal="slide-up-scale"].revealed {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-
-    /* === ENHANCED METRIC CARDS === */
-    
-    .metric-card {
-        position: relative;
-    }
-    
+    .metric-card { position: relative; }
     .metric-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 1.5rem;
+        content: ''; position: absolute; inset: 0; border-radius: 1.5rem;
         background: linear-gradient(135deg, rgba(0, 169, 224, 0.05), rgba(0, 169, 224, 0.02));
-        opacity: 0;
-        transition: opacity 0.5s ease;
+        opacity: 0; transition: opacity 0.5s ease;
     }
-    
-    .metric-card:hover::before {
-        opacity: 1;
-    }
-    
-    .metric-card:hover {
-        transform: translateY(-4px);
-    }
+    .metric-card:hover::before { opacity: 1; }
+    .metric-card:hover { transform: translateY(-4px); }
 
-    /* === ENHANCED TESTIMONIAL CARD === */
-    
-    .testimonial-card {
-        position: relative;
-        overflow: hidden;
-    }
-    
+    .testimonial-card { position: relative; overflow: hidden; }
     .testimonial-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 1.5rem;
+        content: ''; position: absolute; inset: 0; border-radius: 1.5rem;
         background: linear-gradient(135deg, rgba(0, 169, 224, 0.03), rgba(0, 169, 224, 0.01));
-        opacity: 0;
-        transition: opacity 0.5s ease;
+        opacity: 0; transition: opacity 0.5s ease;
     }
-    
-    .testimonial-card:hover::before {
-        opacity: 1;
-    }
-    
-    .testimonial-card:hover {
-        transform: translateY(-2px);
-    }
-    
-    /* Quote text subtle animation */
-    .quote-text {
-        position: relative;
-    }
-    
-    .testimonial-card:hover .quote-text {
-        color: rgba(74, 85, 104, 0.95);
-    }
-    
-    /* Decorative blob pulse */
-    .decorative-blob {
-        animation: blobPulse 8s ease-in-out infinite;
-    }
+    .testimonial-card:hover::before { opacity: 1; }
+    .testimonial-card:hover { transform: translateY(-2px); }
+    .quote-text { position: relative; }
+    .testimonial-card:hover .quote-text { color: rgba(74, 85, 104, 0.95); }
+    .decorative-blob { animation: blobPulse 8s ease-in-out infinite; }
 
-    /* === SUBTLE BACKGROUND PATTERN === */
     .casestudy-bg-pattern {
         background-image: 
             radial-gradient(circle at 15% 25%, rgba(0, 169, 224, 0.08) 1px, transparent 1px),
@@ -212,196 +135,46 @@ const metrics = [
         animation: patternDrift 35s linear infinite;
     }
 
-    /* === ENHANCED CTA BUTTON === */
     .btn-primary {
-        position: relative;
-        overflow: hidden;
+        position: relative; overflow: hidden;
         transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     
-    /* .btn-primary::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15));
-        transform: translateX(-100%);
-        transition: transform 0.6s ease;
-    }
-    
-    .btn-primary:hover::before {
-        transform: translateX(100%);
-    } */
-
-    /* === ORIGINAL CHART ANIMATIONS (PRESERVED) === */
     @keyframes chart-bars {
         0%, 100% { transform: scaleY(1); }
         50% { transform: scaleY(1.1); }
     }
-    
     @keyframes trend-line {
         from { stroke-dasharray: 1000; stroke-dashoffset: 1000; }
         to { stroke-dasharray: 1000; stroke-dashoffset: 0; }
     }
-    
     @keyframes pulse-data {
         0%, 100% { opacity: 0.4; transform: scale(1); }
         50% { opacity: 0.8; transform: scale(1.5); }
     }
-    
     .animate-chart-bars { animation: chart-bars 8s ease-in-out infinite; }
     .animate-trend-line { animation: trend-line 3s ease-out 1s forwards; stroke-dasharray: 1000; stroke-dashoffset: 1000; }
     .animate-pulse-data { animation: pulse-data 2s ease-in-out infinite; }
     .animate-pulse-data-delay-1 { animation: pulse-data 2s ease-in-out infinite 0.5s; }
     .animate-pulse-data-delay-2 { animation: pulse-data 2s ease-in-out infinite 1s; }
-
-    /* === NEW KEYFRAME ANIMATIONS === */
+    
     @keyframes patternDrift {
-        0% {
-            background-position: 0% 0%, 0% 0%, 0% 0%;
-        }
-        100% {
-            background-position: 100% 100%, -100% 100%, 50% -100%;
-        }
+        0% { background-position: 0% 0%, 0% 0%, 0% 0%; }
+        100% { background-position: 100% 100%, -100% 100%, 50% -100%; }
     }
-    
     @keyframes blobPulse {
-        0%, 100% {
-            transform: scale(1) rotate(0deg);
-            opacity: 0.1;
-        }
-        50% {
-            transform: scale(1.1) rotate(180deg);
-            opacity: 0.2;
-        }
+        0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.1; }
+        50% { transform: scale(1.1) rotate(180deg); opacity: 0.2; }
     }
-
-    /* === ACCESSIBILITY & PERFORMANCE === */
-    
-    /* Fallback: show elements if JS doesn't load */
-    .no-js [data-reveal] {
-        opacity: 1 !important;
-        transform: none !important;
-    }
-    
     @media (prefers-reduced-motion: reduce) {
-        [data-reveal],
-        .metric-card,
-        .testimonial-card,
-        .casestudy-bg-pattern,
-        .decorative-blob,
-        .btn-primary {
+        .metric-card, .testimonial-card, .casestudy-bg-pattern, .decorative-blob, .btn-primary,
+        .animate-chart-bars, .animate-trend-line, .animate-pulse-data, .animate-pulse-data-delay-1, .animate-pulse-data-delay-2 {
             animation: none !important;
             transition: none !important;
         }
-        
-        [data-reveal] {
-            opacity: 1;
-            transform: none;
-        }
-        
-        .animate-chart-bars,
-        .animate-trend-line,
-        .animate-pulse-data,
-        .animate-pulse-data-delay-1,
-        .animate-pulse-data-delay-2 {
-            animation: none !important;
-        }
     }
-    
     @media (max-width: 768px) {
-        .casestudy-bg-pattern {
-            display: none; /* Better mobile performance */
-        }
-        
-        .testimonial-card {
-            padding: 1.5rem;
-        }
+        .casestudy-bg-pattern { display: none; }
+        .testimonial-card { padding: 1.5rem; }
     }
 </style>
-
-<script>
-    // CASESTUDY SECTION ANIMATION CONTROLLER
-    document.addEventListener('DOMContentLoaded', () => {
-        const casestudySection = document.querySelector('[data-section="casestudy"]') as HTMLElement;
-        if (!casestudySection) return;
-
-        // FALLBACK: Show elements after 2s if they're still hidden
-        setTimeout(() => {
-            const hiddenElements = casestudySection.querySelectorAll('[data-reveal]:not(.revealed)');
-            hiddenElements.forEach(el => el.classList.add('revealed'));
-        }, 2000);
-
-        // 1. REVEAL SYSTEM - SAME AS OTHER SECTIONS
-        const revealElements = casestudySection.querySelectorAll('[data-reveal]');
-        
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const delay = entry.target.getAttribute('data-reveal-delay') || '0';
-                    setTimeout(() => {
-                        entry.target.classList.add('revealed');
-                    }, parseInt(delay, 10));
-                    revealObserver.unobserve(entry.target);
-                }
-            });
-        }, { 
-            threshold: 0.1,
-            rootMargin: '-5%'
-        });
-
-        revealElements.forEach(el => revealObserver.observe(el));
-
-        // 2. ENHANCED TESTIMONIAL INTERACTION
-        const testimonialCard = casestudySection.querySelector('.testimonial-card');
-        if (testimonialCard) {
-            testimonialCard.addEventListener('mouseenter', () => {
-                const quoteIcon = testimonialCard.querySelector('.quote-icon svg') as HTMLElement;
-                if (quoteIcon) {
-                    quoteIcon.style.transform = 'scale(1.1) rotate(5deg)';
-                }
-            });
-            
-            testimonialCard.addEventListener('mouseleave', () => {
-                const quoteIcon = testimonialCard.querySelector('.quote-icon svg') as HTMLElement;
-                if (quoteIcon) {
-                    quoteIcon.style.transform = '';
-                }
-            });
-        }
-
-        // 3. METRIC CARDS SUBTLE PARALLAX
-        const metricCards = casestudySection.querySelectorAll('.metric-card');
-        
-        let ticking = false;
-        function updateMetricParallax() {
-            const scrolled = window.pageYOffset;
-            const sectionTop = casestudySection.offsetTop;
-            const sectionHeight = casestudySection.offsetHeight;
-            
-            // Only apply when section is in viewport
-            if (scrolled + window.innerHeight > sectionTop && scrolled < sectionTop + sectionHeight) {
-                metricCards.forEach((card, index) => {
-                    const rate = (index + 1) * 0.001; // Very subtle
-                    const yPos = -(scrolled - sectionTop) * rate;
-                    (card as HTMLElement).style.transform = `translateY(${yPos}px)`;
-                });
-            }
-            
-            ticking = false;
-        }
-        
-        function requestMetricParallax() {
-            if (!ticking) {
-                requestAnimationFrame(updateMetricParallax);
-                ticking = true;
-            }
-        }
-        
-        // Only add scroll listener if not reduced motion
-        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            window.addEventListener('scroll', requestMetricParallax, { passive: true });
-        }
-
-        console.log('📊 CaseStudy section enhanced animations loaded');
-    });
-</script>

@@ -1,15 +1,13 @@
 ---
-// src/components/sections/Contact.astro - ENHANCED WITH FULL CONSISTENCY
+// src/components/sections/Contact.astro - FINAL, UNIFIED VERSION
+import AnimateOnScroll from '../ui/AnimateOnScroll.astro'; // Importujemy nasz system animacji
 import ContactForm from '../ui/ContactForm.svelte';
 ---
 
-<section id="kontakt" class="py-20 sm:py-32 bg-background-muted relative overflow-hidden" data-section="contact">
-    <!-- Subtle animated background pattern - consistent with other sections -->
+<section id="kontakt" class="py-20 sm:py-32 bg-background-muted relative overflow-hidden">
     <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
         <div class="contact-bg-pattern absolute inset-0"></div>
     </div>
-
-    <!-- Enhanced convergence background - preserved original animations -->
     <div class="absolute inset-0 opacity-5">
         <svg class="w-full h-full" viewBox="0 0 1200 800">
             <g class="animate-convergence">
@@ -22,74 +20,49 @@ import ContactForm from '../ui/ContactForm.svelte';
         </svg>
     </div>
 
-    <div class="relative z-10 max-w-4xl mx-auto px-4">
-        <!-- Enhanced header with consistent reveal animation -->
-        <div class="text-center mb-12" data-reveal="fade-up" data-reveal-delay="100">
-            <h2 class="section-heading">
-                Zacznijmy koordynować Twój sukces.
-            </h2>
-            <p class="section-subtitle">
-                Wypełnij formularz, a nasz strateg skontaktuje się z Tobą w ciągu <span class="font-semibold text-brand-blue">24h</span>, aby umówić bezpłatną konsultację.
-            </p>
-        </div>
+    <AnimateOnScroll>
+        <div class="relative z-10 max-w-4xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="section-heading">
+                    Zacznijmy koordynować Twój sukces.
+                </h2>
+                <p class="section-subtitle">
+                    Wypełnij formularz, a nasz strateg skontaktuje się z Tobą w ciągu <span class="font-semibold text-brand-blue">24h</span>, aby umówić bezpłatną konsultację.
+                </p>
+            </div>
 
-        <!-- Enhanced contact form with consistent reveal -->
-        <div class="max-w-2xl mx-auto" data-reveal="slide-up-scale" data-reveal-delay="300">
-            <ContactForm client:load />
-        </div>
+            <div class="max-w-2xl mx-auto">
+                <ContactForm client:load />
+            </div>
 
-        <!-- Enhanced contact info with consistent reveal -->
-        <div class="text-center mt-16" data-reveal="fade-up" data-reveal-delay="500">
-            <p class="text-text-muted mb-6">Lub skontaktuj się z nami bezpośrednio:</p>
-            <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
-                <a href="tel:+48123456789" class="contact-link flex items-center text-brand-blue hover:text-brand-blue/80 transition-all duration-300 group">
-                    <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                    </svg>
-                    +48 123 456 789
-                </a>
-                <a href="mailto:kontakt@koordynujzdrowie.pl" class="contact-link flex items-center text-brand-blue hover:text-brand-blue/80 transition-all duration-300 group">
-                    <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    kontakt@koordynujzdrowie.pl
-                </a>
+            <div class="text-center mt-16">
+                <p class="text-text-muted mb-6">Lub skontaktuj się z nami bezpośrednio:</p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
+                    <a href="tel:+48123456789" class="contact-link flex items-center text-brand-blue hover:text-brand-blue/80 transition-all duration-300 group">
+                        <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
+                        +48 123 456 789
+                    </a>
+                    <a href="mailto:kontakt@koordynujzdrowie.pl" class="contact-link flex items-center text-brand-blue hover:text-brand-blue/80 transition-all duration-300 group">
+                        <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        kontakt@koordynujzdrowie.pl
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    </AnimateOnScroll>
 </section>
 
 <style>
-    /* === CONSISTENT REVEAL SYSTEM FROM OTHER SECTIONS === */
-    
-    [data-reveal] {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    
-    [data-reveal="slide-up-scale"] {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-    }
-    
-    [data-reveal].revealed {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    [data-reveal="slide-up-scale"].revealed {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-
-    /* === ENHANCED CONTACT LINKS === */
+    /* Usunięto style dla [data-reveal] */
     .contact-link {
         padding: 0.75rem 1rem;
         border-radius: 0.75rem;
         position: relative;
     }
-    
     .contact-link::before {
         content: '';
         position: absolute;
@@ -99,16 +72,12 @@ import ContactForm from '../ui/ContactForm.svelte';
         opacity: 0;
         transition: opacity 0.3s ease;
     }
-    
     .contact-link:hover::before {
         opacity: 1;
     }
-    
     .contact-link:hover {
         transform: translateY(-1px);
     }
-
-    /* === SUBTLE BACKGROUND PATTERN === */
     .contact-bg-pattern {
         background-image: 
             radial-gradient(circle at 30% 20%, rgba(0, 169, 224, 0.10) 1px, transparent 1px),
@@ -117,119 +86,28 @@ import ContactForm from '../ui/ContactForm.svelte';
         background-size: 160px 160px, 240px 240px, 200px 200px;
         animation: patternDrift 40s linear infinite;
     }
-
-    /* === ORIGINAL SVG ANIMATIONS (PRESERVED) === */
     @keyframes convergence {
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-5px); }
     }
-    
     @keyframes pulse-center {
         0%, 100% { opacity: 0.4; transform: scale(1); }
         50% { opacity: 0.8; transform: scale(1.5); }
     }
-    
     .animate-convergence { animation: convergence 10s ease-in-out infinite; }
     .animate-pulse-center { animation: pulse-center 3s ease-in-out infinite; }
-
-    /* === NEW KEYFRAME ANIMATIONS === */
     @keyframes patternDrift {
-        0% {
-            background-position: 0% 0%, 0% 0%, 0% 0%;
-        }
-        100% {
-            background-position: 100% 100%, -100% 100%, 50% -100%;
-        }
+        0% { background-position: 0% 0%, 0% 0%, 0% 0%; }
+        100% { background-position: 100% 100%, -100% 100%, 50% -100%; }
     }
-
-    /* === ACCESSIBILITY & PERFORMANCE === */
-    
-    /* Fallback: show elements if JS doesn't load */
-    .no-js [data-reveal] {
-        opacity: 1 !important;
-        transform: none !important;
-    }
-    
     @media (prefers-reduced-motion: reduce) {
-        [data-reveal],
-        .contact-link,
-        .contact-bg-pattern {
+        .contact-link, .contact-bg-pattern, .animate-convergence, .animate-pulse-center {
             animation: none !important;
             transition: none !important;
         }
-        
-        [data-reveal] {
-            opacity: 1;
-            transform: none;
-        }
-        
-        .animate-convergence,
-        .animate-pulse-center {
-            animation: none !important;
-        }
     }
-    
     @media (max-width: 768px) {
-        .contact-bg-pattern {
-            display: none; /* Better mobile performance */
-        }
-        
-        .contact-link {
-            padding: 0.5rem 0.75rem;
-        }
+        .contact-bg-pattern { display: none; }
+        .contact-link { padding: 0.5rem 0.75rem; }
     }
 </style>
-
-<script>
-    // CONTACT SECTION ANIMATION CONTROLLER
-    document.addEventListener('DOMContentLoaded', () => {
-        const contactSection = document.querySelector('[data-section="contact"]');
-        if (!contactSection) return;
-
-        // FALLBACK: Show elements after 2s if they're still hidden
-        setTimeout(() => {
-            const hiddenElements = contactSection.querySelectorAll('[data-reveal]:not(.revealed)');
-            hiddenElements.forEach(el => el.classList.add('revealed'));
-        }, 2000);
-
-        // 1. REVEAL SYSTEM - SAME AS OTHER SECTIONS
-        const revealElements = contactSection.querySelectorAll('[data-reveal]');
-        
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const delay = entry.target.getAttribute('data-reveal-delay') || '0';
-                    setTimeout(() => {
-                        entry.target.classList.add('revealed');
-                    }, parseInt(delay, 10));
-                    revealObserver.unobserve(entry.target);
-                }
-            });
-        }, { 
-            threshold: 0.1,
-            rootMargin: '-5%'
-        });
-
-        revealElements.forEach(el => revealObserver.observe(el));
-
-        // 2. ENHANCED CONTACT LINKS INTERACTION
-        const contactLinks = contactSection.querySelectorAll('.contact-link');
-        contactLinks.forEach(link => {
-            link.addEventListener('mouseenter', () => {
-                const icon = link.querySelector('svg');
-                if (icon) {
-                    icon.style.filter = 'drop-shadow(0 2px 4px rgba(0, 169, 224, 0.3))';
-                }
-            });
-            
-            link.addEventListener('mouseleave', () => {
-                const icon = link.querySelector('svg');
-                if (icon) {
-                    icon.style.filter = '';
-                }
-            });
-        });
-
-        console.log('📞 Contact section enhanced animations loaded');
-    });
-</script>

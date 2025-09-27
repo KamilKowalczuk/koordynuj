@@ -1,121 +1,92 @@
 ---
-// src/components/sections/Problems.astro - ENHANCED WITH SUBTLE ANIMATIONS
+// src/components/sections/Problems.astro - REFACTORED WITH UNIFIED ANIMATION
+import AnimateOnScroll from '../ui/AnimateOnScroll.astro'; // Nasz nowy komponent
 import RevenueLossIcon from '../icons/RevenueLossIcon.astro';
 import LegalRiskIcon from '../icons/LegalRiskIcon.astro';
 import InefficiencyIcon from '../icons/InefficiencyIcon.astro';
 import { getProblems } from '../../lib/strapi';
 import DOMPurify from 'isomorphic-dompurify';
 
-// Pobieramy dane z Strapi
 const problemsData = await getProblems();
 
-// Mapa ikon dla różnych typów problemów
 const iconMap = {
   'revenue-loss': RevenueLossIcon,
   'legal-risk': LegalRiskIcon,
   'inefficiency': InefficiencyIcon
 };
 
-// Fallback dane w przypadku braku połączenia ze Strapi
 const fallbackProblems = [
   { title: "Utracone Przychody", description: "Środki finansowe umykają przez brak właściwej weryfikacji raportów i poprawy błędów.", icon: "revenue-loss" },
   { title: "Ryzyko Prawne", description: "Niezgodność z wymogami NFZ czy UODO to ryzyko wysokich, dotkliwych kar finansowych.", icon: "legal-risk" },
   { title: "Nieefektywne Procesy", description: "Niezoptymalizowane procedury administracyjne to gwarancja wypalenia personelu.", icon: "inefficiency" }
 ];
 
-// Używamy danych ze Strapi lub fallback
 const strapiProblems = problemsData && problemsData.length > 0 ? problemsData : fallbackProblems;
 
-// Helper: bezpieczne wstrzyknięcie HTML z CKEditora (Strapi)
 const asHtml = (html: string) => DOMPurify.sanitize(html ?? "", { USE_PROFILES: { html: true } });
 
-// Przekształcamy dane ze Strapi do formatu z komponentami ikon (obsługa v5: attributes)
 const problems = strapiProblems.map((problem: any) => {
   const title = problem?.attributes?.title ?? problem?.title ?? "";
   const description = problem?.attributes?.description ?? problem?.description ?? "";
   const iconKey = problem?.attributes?.icon ?? problem?.icon ?? "revenue-loss";
   return {
     title,
-    description, // surowy HTML, zrenderujemy niżej
+    description,
     Icon: iconMap[iconKey as keyof typeof iconMap] || RevenueLossIcon
   };
 });
 ---
 
-<section id="problemy" class="py-20 sm:py-32 bg-white relative overflow-hidden" data-section="problems">
-  <!-- Subtelne animated background -->
+<section id="problemy" class="py-20 sm:py-32 bg-white relative overflow-hidden">
   <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
     <div class="problems-bg-pattern absolute inset-0"></div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-    <!-- Enhanced header with reveal animation -->
-    <div class="text-center max-w-3xl mx-auto" data-reveal="fade-up" data-reveal-delay="100">
-      <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
-        Chaos ma swoją cenę. Płacisz nią codziennie.
-      </h2>
-      <p class="text-lg text-text-muted mb-16 md:mb-24">
-        Identyfikujemy trzy fundamentalne filary ryzyka, które po cichu erodują rentowność i bezpieczeństwo każdej placówki medycznej.
-      </p>
-    </div>
+  {/* Cała zawartość sekcji opakowana w nasz nowy komponent animacji */}
+  <AnimateOnScroll>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* Usunęliśmy atrybuty 'data-reveal' z nagłówka */}
+      <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
+          Chaos ma swoją cenę. Płacisz nią codziennie.
+        </h2>
+        <p class="text-lg text-text-muted mb-16 md:mb-24">
+          Identyfikujemy trzy fundamentalne filary ryzyka, które po cichu erodują rentowność i bezpieczeństwo każdej placówki medycznej.
+        </p>
+      </div>
 
-    <!-- Enhanced cards grid with staggered reveals -->
-    <div class="grid lg:grid-cols-3 gap-8">
-      {problems.map((problem, index) => (
-        <div 
-          class="problem-card card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10" 
-          data-reveal="slide-up-scale" 
-          data-reveal-delay={200 + (index * 150)}
-          data-problem-index={index}
-        >
-          <!-- Enhanced icon container -->
-          <div class="mb-6 icon-container relative">
-            <div class="icon-glow absolute inset-0 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
-            <problem.Icon className="h-10 w-10 text-brand-blue group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 relative z-10 icon-element" />
+      <div class="grid lg:grid-cols-3 gap-8">
+        {problems.map((problem, index) => (
+          // Usunęliśmy atrybuty 'data-reveal' z kart
+          <div 
+            class="problem-card card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10"
+            data-problem-index={index}
+          >
+            <div class="mb-6 icon-container relative">
+              <div class="icon-glow absolute inset-0 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+              <problem.Icon className="h-10 w-10 text-brand-blue group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 relative z-10 icon-element" />
+            </div>
+            
+            <div class="flex flex-col flex-grow">
+              <h3 class="text-2xl font-bold text-text-primary mb-4 group-hover:text-brand-blue/90 transition-colors duration-300">
+                {problem.title}
+              </h3>
+              <div
+                class="text-text-muted leading-relaxed group-hover:text-text-primary/90 transition-colors duration-300"
+                set:html={asHtml(problem.description)}
+              />
+            </div>
           </div>
-          
-          <div class="flex flex-col flex-grow">
-            <h3 class="text-2xl font-bold text-text-primary mb-4 group-hover:text-brand-blue/90 transition-colors duration-300">
-              {problem.title}
-            </h3>
-            {/* Tu zmiana: render HTML z CKEditora, zachowując identyczne klasy */}
-            <div
-              class="text-text-muted leading-relaxed group-hover:text-text-primary/90 transition-colors duration-300"
-              set:html={asHtml(problem.description)}
-            />
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
-  </div>
+  </AnimateOnScroll>
 </section>
 
 <style>
-  /* === SUBTLE ANIMATION ENHANCEMENTS === */
+  /* === USUNIĘTO WSZYSTKIE STYLE ZWIĄZANE Z 'data-reveal' === */
   
-  /* 1. REVEAL ANIMATIONS - same system as before but tailored for cards */
-  [data-reveal] {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-  
-  [data-reveal="slide-up-scale"] {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  
-  [data-reveal].revealed {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  [data-reveal="slide-up-scale"].revealed {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  /* 2. ENHANCED CARD INTERACTIONS */
+  /* Pozostawione style interakcji i tła - bez zmian */
   .problem-card {
     cursor: default;
     position: relative;
@@ -135,7 +106,6 @@ const problems = strapiProblems.map((problem: any) => {
     opacity: 1;
   }
 
-  /* 3. ICON GLOW EFFECT */
   .icon-glow {
     background: radial-gradient(circle, rgba(0, 169, 224, 0.3) 0%, transparent 70%);
     width: 60px;
@@ -145,7 +115,6 @@ const problems = strapiProblems.map((problem: any) => {
     transform: translate(-50%, -50%);
   }
 
-  /* 4. SUBTLE BACKGROUND PATTERN */
   .problems-bg-pattern {
     background-image: 
       radial-gradient(circle at 25% 25%, rgba(0, 169, 224, 0.3) 1px, transparent 1px),
@@ -154,7 +123,6 @@ const problems = strapiProblems.map((problem: any) => {
     animation: patternDrift 30s linear infinite;
   }
 
-  /* 5. ENHANCED HOVER DEPTH */
   .problem-card:hover {
     transform: translateY(-4px);
   }
@@ -163,111 +131,21 @@ const problems = strapiProblems.map((problem: any) => {
     filter: drop-shadow(0 4px 8px rgba(0, 169, 224, 0.2));
   }
 
-  /* === KEYFRAME ANIMATIONS === */
   @keyframes patternDrift {
-    0% {
-      background-position: 0% 0%, 0% 0%;
-    }
-    100% {
-      background-position: 100% 100%, -100% 100%;
-    }
-  }
-
-  /* === ACCESSIBILITY & PERFORMANCE === */
-  
-  /* Fallback: show elements if JS doesn't load */
-  .no-js [data-reveal] {
-    opacity: 1 !important;
-    transform: none !important;
+    0% { background-position: 0% 0%, 0% 0%; }
+    100% { background-position: 100% 100%, -100% 100%; }
   }
   
   @media (prefers-reduced-motion: reduce) {
-    [data-reveal],
     .problem-card,
     .icon-element,
     .problems-bg-pattern {
       animation: none !important;
       transition: none !important;
     }
-    
-    [data-reveal] {
-      opacity: 1;
-      transform: none;
-    }
   }
   
   @media (max-width: 768px) {
-    .problems-bg-pattern {
-      display: none; /* Better mobile performance */
-    }
+    .problems-bg-pattern { display: none; }
   }
 </style>
-
-<script>
-  // PROBLEMS SECTION ANIMATION CONTROLLER
-  document.addEventListener('DOMContentLoaded', () => {
-    const problemsSection = document.querySelector('[data-section="problems"]') as HTMLElement;
-    if (!problemsSection) return;
-
-    // FALLBACK: Show elements after 2s if they're still hidden
-    setTimeout(() => {
-      const hiddenElements = problemsSection.querySelectorAll('[data-reveal]:not(.revealed)');
-      hiddenElements.forEach(el => el.classList.add('revealed'));
-    }, 2000);
-
-    // 1. REVEAL SYSTEM FOR STAGGERED CARD ANIMATIONS
-    const revealElements = problemsSection.querySelectorAll('[data-reveal]');
-    
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const delay = entry.target.getAttribute('data-reveal-delay') || '0';
-          setTimeout(() => {
-            entry.target.classList.add('revealed');
-          }, parseInt(delay, 10));
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { 
-      threshold: 0.1,
-      rootMargin: '-5%'
-    });
-
-    revealElements.forEach(el => revealObserver.observe(el));
-
-    // 2. SUBTLE CARD PARALLAX ON SCROLL (very gentle)
-    const cards = problemsSection.querySelectorAll('.problem-card');
-    
-    let ticking = false;
-    function updateParallax() {
-      const scrolled = window.pageYOffset;
-      const sectionTop = problemsSection.offsetTop;
-      const sectionHeight = problemsSection.offsetHeight;
-      
-      // Only apply when section is in viewport
-      if (scrolled + window.innerHeight > sectionTop && scrolled < sectionTop + sectionHeight) {
-        cards.forEach((card, index) => {
-          const rate = (index + 1) * 0.002; // Very subtle
-          const yPos = -(scrolled - sectionTop) * rate;
-          (card as HTMLElement).style.transform = `translateY(${yPos}px)`;
-        });
-      }
-      
-      ticking = false;
-    }
-    
-    function requestParallax() {
-      if (!ticking) {
-        requestAnimationFrame(updateParallax);
-        ticking = true;
-      }
-    }
-    
-    // Only add scroll listener if not reduced motion
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      window.addEventListener('scroll', requestParallax, { passive: true });
-    }
-
-    console.log('🎯 Problems section enhanced animations loaded');
-  });
-</script>

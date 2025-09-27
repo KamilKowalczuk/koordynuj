@@ -5,9 +5,10 @@ import logoSvg from '../../assets/logo.svg';
 
 interface Props {
     className?: string;
+    isHomepage?: boolean; // Nowa właściwość
 }
 
-const { className } = Astro.props;
+const { className, isHomepage = false } = Astro.props;
 ---
 <div class:list={["logo-container", className]}>
     <a href="/" aria-label="Strona główna Koordynuj Zdrowie">
@@ -21,15 +22,18 @@ const { className } = Astro.props;
     </a>
 </div>
 
-<style>
+<style define:vars={{
+    initialWidth: isHomepage ? '230px' : '150px',
+    scrolledWidth: '150px'
+}}>
     .logo-container :global(img) {
-        /* Domyślny, większy rozmiar na starcie */
-        width: 230px;
+        /* Używamy zmiennych CSS do dynamicznego ustawienia rozmiaru */
+        width: var(--initialWidth);
         transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Kiedy header-rodzic ma atrybut data-scrolled="true", zmniejszamy logo */
+    /* Zmniejszamy logo po przewinięciu, ale tylko na stronie głównej */
     :global(header[data-scrolled="true"]) .logo-container :global(img) {
-        width: 150px;
+        width: var(--scrolledWidth);
     }
 </style>

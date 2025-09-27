@@ -71,23 +71,20 @@
         <span class="prefix">{prefix}</span><span class="value">{formattedValue}</span><span class="suffix">{suffix}</span>
     </div>
     
-    <!-- Subtelny progress bar pokazujący postęp animacji -->
     <div class="mt-3 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
         <div 
-            class={`h-full bg-gradient-to-r transition-all duration-${duration} ease-out ${
+            class={`h-full bg-gradient-to-r transition-all ease-out ${
                 color === 'blue' ? 'from-brand-blue to-brand-blue/70' :
                 color === 'green' ? 'from-green-600 to-green-400' :
                 color === 'orange' ? 'from-orange-500 to-orange-300' :
                 'from-red-600 to-red-400'
             }`}
-            style="width: {hasStarted ? ($count / targetValue) * 100 : 0}%"
+            style="width: {hasStarted ? ($count / targetValue) * 100 : 0}%; transition-duration: {duration}ms;"
         ></div>
     </div>
 </div>
 
 <style>
-
-    
     .prefix, .suffix {
         font-weight: 600;
     }

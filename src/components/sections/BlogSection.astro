@@ -1,60 +1,38 @@
 ---
-// src/components/sections/BlogSection.astro - FIXED VERSION
-// Fixed TypeScript union type errors and improved data access patterns
-
+// src/components/sections/BlogSection.astro - UNIFIED ANIMATION
+import AnimateOnScroll from '../ui/AnimateOnScroll.astro'; // Importujemy nasz system animacji
 import { getBlogPosts } from '../../lib/strapi';
 
-// Fetch blog posts (limit 6 for homepage)
 const blogPosts = await getBlogPosts(6);
 
-// Fallback blog posts for development/demo (mocked data that matches actual structure)
 const fallbackPosts = [
     {
-        id: 1,
-        slug: "nowe-przepisy-medyczne-2024",
-        title: "Nowe przepisy medyczne w 2024 roku",
+        id: 1, slug: "nowe-przepisy-medyczne-2024", title: "Nowe przepisy medyczne w 2024 roku",
         excerpt: "Przegląd najważniejszych zmian prawnych, które wpływają na funkcjonowanie placówek medycznych.",
-        publishedAt: "2024-01-15",
-        author: { name: "Koordynuj Zdrowie", avatar: null },
-        featuredImage: null,
-        category: "Prawo medyczne"
+        publishedAt: "2024-01-15", author: { name: "Koordynuj Zdrowie", avatar: null },
+        featuredImage: null, category: "Prawo medyczne"
     },
     {
-        id: 2,
-        slug: "optymalizacja-rozliczen",
-        title: "Jak zoptymalizować rozliczenia NFZ",
+        id: 2, slug: "optymalizacja-rozliczen", title: "Jak zoptymalizować rozliczenia NFZ",
         excerpt: "Praktyczne wskazówki dotyczące poprawy efektywności rozliczeń z Narodowym Funduszem Zdrowia.",
-        publishedAt: "2024-01-10",
-        author: { name: "Koordynuj Zdrowie", avatar: null },
-        featuredImage: null,
-        category: "Rozliczenia"
+        publishedAt: "2024-01-10", author: { name: "Koordynuj Zdrowie", avatar: null },
+        featuredImage: null, category: "Rozliczenia"
     },
     {
-        id: 3,
-        slug: "digitalizacja-placowki",
-        title: "Digitalizacja placówki medycznej",
+        id: 3, slug: "digitalizacja-placowki", title: "Digitalizacja placówki medycznej",
         excerpt: "Kompletny przewodnik po cyfrowej transformacji gabinetu lekarskiego.",
-        publishedAt: "2024-01-05",
-        author: { name: "Koordynuj Zdrowie", avatar: null },
-        featuredImage: null,
-        category: "Technologia"
+        publishedAt: "2024-01-05", author: { name: "Koordynuj Zdrowie", avatar: null },
+        featuredImage: null, category: "Technologia"
     }
 ];
 
-// Use fetched posts or fallback to demo data
 const posts = Array.isArray(blogPosts) && blogPosts.length > 0 ? blogPosts : fallbackPosts;
 
-// Helper do formatowania daty
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('pl-PL', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    });
+    return date.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
-// Helper do tworzenia excerpta jeśli nie ma
 const createExcerpt = (content: string, length: number = 120) => {
     if (!content) return "";
     const plainText = content.replace(/<[^>]*>/g, '');
@@ -62,151 +40,83 @@ const createExcerpt = (content: string, length: number = 120) => {
 };
 ---
 
-<section id="blog" class="py-20 sm:py-32 bg-background-light relative overflow-hidden" data-section="blog">
-    <!-- Subtle animated background pattern - consistent with other sections -->
+<section id="blog" class="py-20 sm:py-32 bg-background-light relative overflow-hidden">
     <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
         <div class="blog-bg-pattern absolute inset-0"></div>
     </div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Enhanced header with consistent reveal animation -->
-        <div class="text-center max-w-3xl mx-auto mb-16" data-reveal="fade-up" data-reveal-delay="100">
-            <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
-                Wiedza, która się opłaca.
-            </h2>
-            <p class="text-lg text-text-muted">
-                Praktyczne porady, aktualne przepisy i sprawdzone strategie dla placówek medycznych.
-            </p>
-        </div>
+    <AnimateOnScroll>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                    Wiedza, która się opłaca.
+                </h2>
+                <p class="text-lg text-text-muted">
+                    Praktyczne porady, aktualne przepisy i sprawdzone strategie dla placówek medycznych.
+                </p>
+            </div>
 
-        <!-- Enhanced blog cards grid with staggered reveals -->
-        <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-12">
-            {posts.map((post, index) => {
-                // Safe property access for union types
-                const author = post.author || { name: "Koordynuj Zdrowie" };
-                const category = typeof post.category === 'string' ? post.category : post.category?.name || "Artykuł";
-                
-                return (
-                    <article 
-                        class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10"
-                        data-reveal="slide-up-scale"
-                        data-reveal-delay={200 + (index * 100)}
-                    >
-                        {/* Featured Image */}
-                        <div class="aspect-[16/9] bg-gradient-to-br from-brand-blue/10 to-brand-blue/5 rounded-t-3xl overflow-hidden relative">
-                            {post.featuredImage?.url ? (
-                                <img 
-                                    src={post.featuredImage.url} 
-                                    alt={post.title}
-                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                            ) : (
-                                <div class="w-full h-full flex items-center justify-center">
-                                    <svg class="w-16 h-16 text-brand-blue/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                </div>
-                            )}
-                            
-                            {/* Category Badge */}
-                            <div class="absolute top-4 left-4">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-blue/90 text-white">
-                                    {category}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Card Content */}
-                        <div class="flex flex-col flex-grow p-6">
-                            
-                            {/* Meta Info */}
-                            <div class="flex items-center text-sm text-text-muted mb-3">
-                                <div class="flex items-center">
-                                    <div class="w-6 h-6 bg-gradient-to-br from-brand-blue to-brand-blue/80 rounded-full flex items-center justify-center mr-2">
-                                        <span class="text-white text-xs font-bold">
-                                            {author.name?.charAt(0) || "K"}
-                                        </span>
+            <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-12">
+                {posts.map((post) => {
+                    const author = post.author || { name: "Koordynuj Zdrowie" };
+                    const category = typeof post.category === 'string' ? post.category : post.category?.name || "Artykuł";
+                    
+                    return (
+                        <article class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10">
+                            <div class="aspect-[16/9] bg-gradient-to-br from-brand-blue/10 to-brand-blue/5 rounded-t-3xl overflow-hidden relative">
+                                {post.featuredImage?.url ? (
+                                    <img src={post.featuredImage.url} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                ) : (
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <svg class="w-16 h-16 text-brand-blue/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </div>
-                                    <span>{author.name}</span>
+                                )}
+                                <div class="absolute top-4 left-4">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-blue/90 text-white">
+                                        {category}
+                                    </span>
                                 </div>
-                                <span class="mx-2">•</span>
-                                {/* FIXED: Only use publishedAt property that exists in both union types */}
-                                <time>{formatDate(post.publishedAt ?? "")}</time>
                             </div>
+                            <div class="flex flex-col flex-grow p-6">
+                                <div class="flex items-center text-sm text-text-muted mb-3">
+                                    
+                                    <time>{formatDate(post.publishedAt ?? "")}</time>
+                                </div>
+                                <h3 class="text-xl font-bold text-text-primary mb-3 group-hover:text-brand-blue/90 transition-colors duration-300 line-clamp-2">
+                                    {post.title}
+                                </h3>
+                                <p class="text-text-muted leading-relaxed mb-4 flex-grow line-clamp-3">
+                                    {post.excerpt || "Przeczytaj więcej w pełnym artykule..."}
+                                </p>
+                                <a href={`/blog/${post.slug}`} class="inline-flex items-center text-brand-blue font-semibold mt-auto group-hover:translate-x-1 transition-transform duration-300">
+                                    Czytaj więcej
+                                    <svg class="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                </a>
+                            </div>
+                        </article>
+                    );
+                })}
+            </div>
 
-                            {/* Title */}
-                            <h3 class="text-xl font-bold text-text-primary mb-3 group-hover:text-brand-blue/90 transition-colors duration-300 line-clamp-2">
-                                {post.title}
-                            </h3>
-
-                            {/* Excerpt - FIXED: Use excerpt property that exists in both types, with fallback to empty string */}
-                            <p class="text-text-muted leading-relaxed mb-4 flex-grow line-clamp-3">
-                                {post.excerpt || "Przeczytaj więcej w pełnym artykule..."}
-                            </p>
-
-                            {/* Read More Link */}
-                            <a 
-                                href={`/blog/${post.slug}`}
-                                class="inline-flex items-center text-brand-blue font-semibold mt-auto group-hover:translate-x-1 transition-transform duration-300"
-                            >
-                                Czytaj więcej
-                                <svg class="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
-                );
-            })}
+            <div class="text-center">
+                <p class="text-lg text-text-muted mb-6">
+                    Chcesz być na bieżąco z <span class="font-semibold text-brand-blue">najnowszymi przepisami</span>?
+                </p>
+                <a href="/blog" class="btn-primary inline-flex items-center group">
+                    Zobacz wszystkie artykuły
+                    <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
         </div>
-
-        <!-- Enhanced CTA to blog index -->
-        <div class="text-center" data-reveal="fade-up" data-reveal-delay="600">
-            <p class="text-lg text-text-muted mb-6">
-                Chcesz być na bieżąco z <span class="font-semibold text-brand-blue">najnowszymi przepisami</span>?
-            </p>
-            <a href="/blog" class="btn-primary inline-flex items-center group">
-                Zobacz wszystkie artykuły
-                <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
-            </a>
-        </div>
-    </div>
+    </AnimateOnScroll>
 </section>
 
 <style>
-    /* === CONSISTENT REVEAL SYSTEM FROM OTHER SECTIONS === */
-    
-    [data-reveal] {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    
-    [data-reveal="slide-up-scale"] {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-    }
-    
-    [data-reveal].revealed {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    [data-reveal="slide-up-scale"].revealed {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-
-    /* === ENHANCED BLOG CARDS - IDENTICAL TO OTHER SECTIONS === */
-    
+    /* Usunięto style dla [data-reveal] */
     .blog-card {
         position: relative;
         cursor: pointer;
     }
-    
     .blog-card::before {
         content: '';
         position: absolute;
@@ -216,31 +126,24 @@ const createExcerpt = (content: string, length: number = 120) => {
         opacity: 0;
         transition: opacity 0.5s ease;
     }
-    
     .blog-card:hover::before {
         opacity: 1;
     }
-    
     .blog-card:hover {
         transform: translateY(-4px);
     }
-
-    /* === LINE CLAMP UTILITIES === */
     .line-clamp-2 {
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
-    
     .line-clamp-3 {
         display: -webkit-box;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
-
-    /* === SUBTLE BACKGROUND PATTERN === */
     .blog-bg-pattern {
         background-image: 
             radial-gradient(circle at 20% 30%, rgba(0, 169, 224, 0.08) 1px, transparent 1px),
@@ -249,102 +152,20 @@ const createExcerpt = (content: string, length: number = 120) => {
         background-size: 180px 180px, 220px 220px, 200px 200px;
         animation: patternDrift 35s linear infinite;
     }
-
-    /* === KEYFRAME ANIMATIONS === */
     @keyframes patternDrift {
-        0% {
-            background-position: 0% 0%, 0% 0%, 0% 0%;
-        }
-        100% {
-            background-position: 100% 100%, -100% 100%, 50% -100%;
-        }
+        0% { background-position: 0% 0%, 0% 0%, 0% 0%; }
+        100% { background-position: 100% 100%, -100% 100%, 50% -100%; }
     }
-
-    /* === ACCESSIBILITY & PERFORMANCE === */
-    
-    /* Fallback: show elements if JS doesn't load */
-    .no-js [data-reveal] {
-        opacity: 1 !important;
-        transform: none !important;
-    }
-    
     @media (prefers-reduced-motion: reduce) {
-        [data-reveal],
         .blog-card,
         .blog-bg-pattern {
             animation: none !important;
             transition: none !important;
         }
-        
-        [data-reveal] {
-            opacity: 1;
-            transform: none;
-        }
     }
-    
     @media (max-width: 768px) {
         .blog-bg-pattern {
-            display: none; /* Better mobile performance */
+            display: none;
         }
     }
 </style>
-
-<script>
-    // BLOG SECTION ANIMATION CONTROLLER
-    document.addEventListener('DOMContentLoaded', () => {
-        const blogSection = document.querySelector('[data-section="blog"]') as HTMLElement;
-        if (!blogSection) return;
-
-        // FALLBACK: Show elements after 2s if they're still hidden
-        setTimeout(() => {
-            const hiddenElements = blogSection.querySelectorAll('[data-reveal]:not(.revealed)');
-            hiddenElements.forEach(el => el.classList.add('revealed'));
-        }, 2000);
-
-        // INTERSECTION OBSERVER - PERFORMANCE OPTIMIZED
-        const observerOptions: IntersectionObserverInit = {
-            rootMargin: '50px 0px -100px 0px', // Start animation slightly before entering viewport
-            threshold: [0, 0.1]
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const element = entry.target as HTMLElement;
-                
-                if (entry.isIntersecting && entry.intersectionRatio > 0) {
-                    // Add delay from data attribute
-                    const delay = parseInt(element.dataset.revealDelay || '0');
-                    
-                    setTimeout(() => {
-                        element.classList.add('revealed');
-                    }, delay);
-                    
-                    // Stop observing once revealed for performance
-                    observer.unobserve(element);
-                }
-            });
-        }, observerOptions);
-
-        // Observe all reveal elements within this section
-        const revealElements = blogSection.querySelectorAll('[data-reveal]');
-        revealElements.forEach(el => observer.observe(el));
-
-        // CLEANUP: Disconnect observer when section is removed (if using frameworks)
-        const cleanup = () => observer.disconnect();
-        
-        // Handle page visibility changes for performance
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                observer.disconnect();
-            } else if (revealElements.length > 0) {
-                revealElements.forEach(el => {
-                    if (!el.classList.contains('revealed')) {
-                        observer.observe(el);
-                    }
-                });
-            }
-        });
-
-        return cleanup;
-    });
-</script>

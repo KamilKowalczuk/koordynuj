@@ -13,6 +13,9 @@ interface Props {
 
 const { title, description } = Astro.props;
 
+// Sprawdzamy, czy jesteśmy na stronie głównej
+const isHomepage = Astro.url.pathname === '/';
+
 const siteTitle = title || "Koordynuj Zdrowie";
 const siteDescription = description || "Zarządzanie medycyną. Zredukowane do perfekcji.";
 const themeColor = "#00A9E0";
@@ -21,6 +24,7 @@ const themeColor = "#00A9E0";
 <!doctype html>
 <html lang="pl">
     <head>
+        {/* ... (reszta sekcji head bez zmian) ... */}
         <meta charset="UTF-8" />
         <meta name="description" content={siteDescription} />
         <meta name="viewport" content="width=device-width" />
@@ -44,9 +48,9 @@ const themeColor = "#00A9E0";
     <body class="bg-background-light text-text-primary font-sans antialiased">
         <Header client:load>
             <div slot="logo">
-                {/* --- ZMIANA 1: Link logo prowadzi do strony głównej --- */}
                 <a href="/" class="flex-shrink-0">
-                    <Logo />
+                    {/* Przekazujemy nową właściwość do komponentu Logo */}
+                    <Logo isHomepage={isHomepage} />
                 </a>
             </div>
         </Header>
@@ -59,8 +63,7 @@ const themeColor = "#00A9E0";
         <ServicePanel client:load />
         
         <script>
-            // --- ZMIANA 2: Zapewnienie, że strona zawsze ładuje się od góry ---
-            // To nowoczesny sposób, aby wyłączyć automatyczne przywracanie pozycji przewijania przez przeglądarkę.
+            // ... (reszta skryptu bez zmian) ...
             if (history.scrollRestoration) {
                 history.scrollRestoration = 'manual';
             } else {
@@ -69,13 +72,11 @@ const themeColor = "#00A9E0";
                 };
             }
 
-            // Płynne przewijanie do sekcji (logika pozostaje bez zmian)
             document.addEventListener('DOMContentLoaded', () => {
                 const links = document.querySelectorAll('a[href^="#"]');
                 links.forEach(link => {
                     link.addEventListener('click', (e) => {
                         const href = link.getAttribute('href');
-                        // Ignorujemy linki, które mają tylko "#", aby uniknąć błędów
                         if (href === '#') {
                             e.preventDefault();
                             window.scrollTo({ top: 0, behavior: 'smooth' });

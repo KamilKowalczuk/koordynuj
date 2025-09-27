@@ -365,4 +365,24 @@
   margin: 1rem 0;
 }
 
-:root { --header-h: 80px; } /* np. 80px */
+.animate-on-scroll {
+  /* Stan początkowy: element jest niewidoczny i lekko przesunięty w dół */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-on-scroll.is-visible {
+  /* Stan końcowy: element jest w pełni widoczny i na swojej docelowej pozycji */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Opcjonalnie: dla użytkowników, którzy preferują zredukowany ruch */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-scroll {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

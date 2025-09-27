@@ -1,11 +1,10 @@
 ---
-// src/layouts/MainLayout.astro - TYMCZASOWO BEZ GLOBAL SETTINGS
+// src/layouts/MainLayout.astro
 import '../styles/global.css';
 import ServicePanel from '../components/ui/ServicePanel.svelte';
 import Header from '../components/layout/Header.svelte';
 import Footer from '../components/layout/Footer.astro';
 import Logo from '../components/ui/Logo.astro';
-// import { getGlobalSettings } from '../lib/strapi'; // Tymczasowo wyłączone
 
 interface Props {
     title: string;
@@ -14,9 +13,6 @@ interface Props {
 
 const { title, description } = Astro.props;
 
-// Tymczasowo używamy tylko props, bez Strapi
-// const globalSettings = await getGlobalSettings();
-
 const siteTitle = title || "Koordynuj Zdrowie";
 const siteDescription = description || "Zarządzanie medycyną. Zredukowane do perfekcji.";
 const themeColor = "#00A9E0";
@@ -24,83 +20,81 @@ const themeColor = "#00A9E0";
 
 <!doctype html>
 <html lang="pl">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content={siteDescription} />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{siteTitle}</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" content={siteDescription} />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{siteTitle}</title>
 
-		<!-- Fonty -->
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-		
-		<!-- Meta tags dla SEO -->
-		<meta property="og:title" content={siteTitle} />
-		<meta property="og:description" content={siteDescription} />
-		<meta property="og:type" content="website" />
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:title" content={siteTitle} />
-		<meta name="twitter:description" content={siteDescription} />
-		
-		<!-- Dodatkowe meta tags dla performance -->
-		<meta name="theme-color" content={themeColor} />
-	</head>
-	<body class="bg-background-light text-text-primary font-sans antialiased">
-		<!-- Header z logo -->
-		<Header client:load>
-			<div slot="logo">
-				<a href="#top" class="flex-shrink-0">
-					<Logo width={150} />
-				</a>
-			</div>
-		</Header>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+        
+        <meta property="og:title" content={siteTitle} />
+        <meta property="og:description" content={siteDescription} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={siteTitle} />
+        <meta name="twitter:description" content={siteDescription} />
+        
+        <meta name="theme-color" content={themeColor} />
+    </head>
+    <body class="bg-background-light text-text-primary font-sans antialiased">
+        <Header client:load>
+            <div slot="logo">
+                {/* --- ZMIANA 1: Link logo prowadzi do strony głównej --- */}
+                <a href="/" class="flex-shrink-0">
+                    <Logo />
+                </a>
+            </div>
+        </Header>
 
-		<!-- Główna zawartość strony -->
-		<slot />
+        <main id="top">
+            <slot />
+        </main>
 
-		<!-- Footer -->
-		<Footer />
+        <Footer />
+        <ServicePanel client:load />
+        
+        <script>
+            // --- ZMIANA 2: Zapewnienie, że strona zawsze ładuje się od góry ---
+            // To nowoczesny sposób, aby wyłączyć automatyczne przywracanie pozycji przewijania przez przeglądarkę.
+            if (history.scrollRestoration) {
+                history.scrollRestoration = 'manual';
+            } else {
+                window.onbeforeunload = () => {
+                    window.scrollTo(0, 0);
+                };
+            }
 
-		<!-- Panel usług (overlay) -->
-		<ServicePanel client:load />
-		
-		<!-- Smooth scroll behavior -->
-		<script>
-			  // Funkcja wymuszająca start od góry (ale NIE, gdy wchodzimy z #kotwicą)
-			const scrollTopIfNoHash = () => {
-				if (!location.hash) {
-				// dwukrotny rAF, żeby przebić się po reflowach
-				requestAnimationFrame(() => {
-					requestAnimationFrame(() => {
-					window.scrollTo(0, 0);
-					});
-				});
-				}
-			};
+            // Płynne przewijanie do sekcji (logika pozostaje bez zmian)
+            document.addEventListener('DOMContentLoaded', () => {
+                const links = document.querySelectorAll('a[href^="#"]');
+                links.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        const href = link.getAttribute('href');
+                        // Ignorujemy linki, które mają tylko "#", aby uniknąć błędów
+                        if (href === '#') {
+                            e.preventDefault();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            return;
+                        }
 
-			// Normalne załadowanie
-			window.addEventListener('load', scrollTopIfNoHash);
-
-			// Powrót z BFCache (np. back/forward) też potrafi przywrócić scroll
-			window.addEventListener('pageshow', (e) => {
-				if (e.persisted) scrollTopIfNoHash();
-			});
-			// Płynne przewijanie do sekcji
-			document.addEventListener('DOMContentLoaded', () => {
-				const links = document.querySelectorAll('a[href^="#"]');
-				links.forEach(link => {
-				link.addEventListener('click', (e) => {
-					const targetId = link.getAttribute('href')?.substring(1);
-					const targetElement = targetId ? document.getElementById(targetId) : null;
-					if (!targetElement) return; // brak elementu -> zostaw default
-					e.preventDefault();
-					targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-				});
-				});
-			});
-		</script>
-	</body>
+                        const targetId = href?.substring(1);
+                        const targetElement = document.getElementById(targetId || '');
+                        
+                        if (targetElement) {
+                            e.preventDefault();
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
 </html>

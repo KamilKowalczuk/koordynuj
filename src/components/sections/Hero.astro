@@ -1,12 +1,10 @@
 ---
-// src/components/sections/Hero.astro - WERSJA DYNAMICZNA Z ZACHOWANIEM STRUKTURY
+// src/components/sections/Hero.astro - WERSJA ZREFAKTORYZOWANA DLA PERFEKCYJNEJ RESPONSYWNOŚCI
 import InteractiveSphere from '../ui/InteractiveSphere.svelte';
 import { getHeroSection } from '../../lib/strapi';
 
-// Pobieramy dane z Strapi
 const heroData = await getHeroSection();
 
-// Fallback dane w przypadku braku połączenia ze Strapi
 const fallbackData = {
     mainTitle: "Zarządzanie medycyną.",
     subTitle: "Zredukowane do perfekcji.",
@@ -15,36 +13,29 @@ const fallbackData = {
     ctaButtonLink: "#kontakt"
 };
 
-// Używamy danych ze Strapi lub fallback
 const hero = heroData || fallbackData;
 
-// Przetwarzamy description żeby obsłużyć markdown bold
 const processDescription = (desc: string) => {
     return desc.replace(/\*\*(.*?)\*\*/g, '<span class="block font-semibold text-text-primary mt-1">$1</span>');
 };
 ---
-<!-- stały bezpieczny odstęp od headera -->
+
 <section
   class="relative bg-background-light overflow-hidden
-         pt-[calc(var(--header-h,150px)+7rem)]"
+         pt-[var(--header-h,150px)]"
 >
-  <!-- pełna wysokość sekcji, ale z odejściem na header -->
   <div
     class="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8
-           min-h-[calc(100svh-var(--header-h,150px)-7rem)]"
+           min-h-[calc(100svh-var(--header-h,150px)-7rem)]
+           flex items-center justify-center"
   >
-    <!-- GRID poziom 5: <lg dwa wiersze, >=lg dwie kolumny, oba elementy pionowo centrowane -->
     <div
-      class="grid h-full gap-x-6 lg:gap-x-8 gap-y-10
-             grid-cols-12
-             grid-rows-[auto_1fr] lg:grid-rows-1
-             content-center items-center"
+      class="relative grid w-full grid-cols-12 items-center
+             gap-x-6 lg:gap-x-8"
     >
-      <!-- LEWA: TEKST (bez zmian wizualnych) -->
       <div
         class="relative z-20 col-span-12 lg:col-span-6
-               text-center lg:text-left
-               place-self-start lg:place-self-auto"
+               text-center lg:text-left"
       >
         <div class="hero-content">
           <h1 class="text-5xl md:text-7xl font-extrabold text-text-primary leading-tight tracking-tighter hero-element" style="--delay: 400ms;">
@@ -65,19 +56,13 @@ const processDescription = (desc: string) => {
         </div>
       </div>
 
-      <!-- PRAWA: KULA -->
       <div
-        class="pointer-events-none col-span-12 lg:col-span-6
-               row-start-2 lg:row-auto
-               justify-self-center lg:justify-self-end
-               self-center
-               pr-4 sm:pr-6 lg:pr-8
-               z-0 lg:z-10"
+        class="absolute inset-0 z-0 flex items-center justify-center
+               lg:pointer-events-none lg:relative lg:col-span-6 lg:col-start-7 lg:z-10"
       >
         <div
           class="aspect-square opacity-50
-                 w-[clamp(260px,60vw,560px)]
-                 sm:w-[clamp(300px,55vw,620px)]
+                 w-[clamp(280px,80vw,480px)]
                  lg:w-[min(42vw,640px)]
                  xl:w-[min(36vw,680px)]"
         >
@@ -87,8 +72,6 @@ const processDescription = (desc: string) => {
     </div>
   </div>
 </section>
-
-
 
 <style>
     .hero-content { opacity: 1; transform: translateY(0); }
@@ -105,7 +88,7 @@ const processDescription = (desc: string) => {
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('sphere-ready', () => {
-            console.log('Sphere desktop position fixed! 🚀');
+            console.log('Sphere position refactored and ready! 🚀');
         });
     });
 </script>

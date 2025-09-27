@@ -1,15 +1,35 @@
 ---
 // src/components/ui/Logo.astro
 import { Image } from 'astro:assets';
-import logoSvg from '../../assets/logo.svg'; // Upewnij się, że plik nazywa się 'logo.svg'
+import logoSvg from '../../assets/logo.svg';
 
 interface Props {
-    width?: number;
     className?: string;
 }
 
-const { width = 200, className } = Astro.props;
+const { className } = Astro.props;
 ---
 <div class:list={["logo-container", className]}>
-    <Image src={logoSvg} alt="Koordynuj Zdrowie Logo" width={width} />
+    <a href="/" aria-label="Strona główna Koordynuj Zdrowie">
+        <Image 
+            src={logoSvg} 
+            alt="Koordynuj Zdrowie Logo" 
+            class="h-auto" 
+            widths={[150, 200]}
+            sizes="(max-width: 1024px) 150px, 200px"
+        />
+    </a>
 </div>
+
+<style>
+    .logo-container :global(img) {
+        /* Domyślny, większy rozmiar na starcie */
+        width: 230px;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Kiedy header-rodzic ma atrybut data-scrolled="true", zmniejszamy logo */
+    :global(header[data-scrolled="true"]) .logo-container :global(img) {
+        width: 150px;
+    }
+</style>

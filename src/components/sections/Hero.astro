@@ -1,5 +1,5 @@
 ---
-// src/components/sections/Hero.astro - WERSJA ZREFAKTORYZOWANA DLA PERFEKCYJNEJ RESPONSYWNOŚCI
+// src/components/sections/Hero.astro - WERSJA Z FINALNYM POWIĘKSZENIEM KULI
 import InteractiveSphere from '../ui/InteractiveSphere.svelte';
 import { getHeroSection } from '../../lib/strapi';
 
@@ -38,7 +38,7 @@ const processDescription = (desc: string) => {
                text-center lg:text-left"
       >
         <div class="hero-content">
-          <h1 class="text-5xl md:text-7xl font-extrabold text-text-primary leading-tight tracking-tighter hero-element" style="--delay: 400ms;">
+          <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-text-primary leading-tight tracking-tighter hero-element" style="--delay: 400ms;">
             <span class="block">{hero.mainTitle}</span>
             <span class="block text-brand-blue mt-2">{hero.subTitle}</span>
           </h1>
@@ -60,12 +60,12 @@ const processDescription = (desc: string) => {
         class="absolute inset-0 z-0 flex items-center justify-center
                lg:pointer-events-none lg:relative lg:col-span-6 lg:col-start-7 lg:z-10"
       >
-        <div
-          class="aspect-square opacity-50
-                 w-[clamp(280px,80vw,480px)]
-                 lg:w-[min(42vw,640px)]
-                 xl:w-[min(36vw,680px)]"
-        >
+      <div
+          class="aspect-square opacity-100
+                  w-[clamp(400px,95vw,620px)]
+                  lg:w-[min(55vw,860px)]
+                  xl:w-[min(52vw,940px)]"
+      >
           <InteractiveSphere client:load />
         </div>
       </div>
@@ -84,11 +84,3 @@ const processDescription = (desc: string) => {
     @keyframes hero-enhance { to { opacity: 1; transform: translateY(0); } }
     @media (prefers-reduced-motion: reduce) { .hero-element { opacity: 1; transform: none; animation: none; } }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        window.addEventListener('sphere-ready', () => {
-            console.log('Sphere position refactored and ready! 🚀');
-        });
-    });
-</script>

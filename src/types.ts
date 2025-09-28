@@ -1,40 +1,97 @@
-// src/types.ts - ENHANCED WITH NEW STRAPI STRUCTURE
+// src/types.ts - JEDNO, CENTRALNE ŹRÓDŁO PRAWDY DLA TYPÓW
 
 // Definiujemy dopuszczalne klucze dla naszych ikon.
 export type IconKey = 'prevention' | 'efficiency' | 'legal' | 'startup';
 
-// ENHANCED: Zaktualizowany interfejs Service zgodny z nową strukturą Strapi
+// --- GŁÓWNE TYPY TREŚCI ---
+
+export interface GlobalSettings {
+    siteTitle: string;
+    siteDescription: string;
+    logo?: { data?: { attributes: { url: string; alternativeText: string; } } };
+    primaryColor: string;
+    contactPhone: string;
+    contactEmail: string;
+    companyAddress: string;
+}
+
+export interface HeroSection {
+    mainTitle: string;
+    subTitle: string;
+    description: string;
+    ctaButtonText: string;
+    ctaButtonLink: string;
+}
+
+export interface Problem {
+    id: number;
+    title: string;
+    description: string;
+    icon: string;
+    order: number;
+}
+
 export interface Service {
     id: number;
     title: string;
     shortDescription: string;
     icon: IconKey;
-    
-    // Nowe sekcje treści zgodne ze Strapi
-    whyWorthIt: string;        // "Dlaczego warto?" - Rich text
-    scope: string;             // "Zakres naszej oferty" - Rich text
-    benefitsFacility: string;  // "Korzyści dla placówki" - Rich text
-    benefitsPatients: string;  // "Korzyści dla pacjentów" - Rich text
-    collaborationModel: string; // "Model współpracy - działania" - Rich text
-    collaborationSummary: string; // "Model współpracy - podsumowanie (blue box)" - Rich text
-    
-    // Opcjonalne pola z Strapi
-    order?: number;
-    isActive?: boolean;
-}
-
-// Typ pomocniczy dla danych z Strapi API (może mieć inne nazwy pól)
-export interface StrapiServiceResponse {
-    id: number;
-    title: string;
-    shortDescription: string;
-    icon: string;
-    order: number;
-    isActive: boolean;
     whyWorthIt: string;
     scope: string;
     benefitsFacility: string;
     benefitsPatients: string;
     collaborationModel: string;
-    collaborationSummary: string;
+    collaborationSummary?: string;
+    order?: number;
+    isActive?: boolean;
+}
+
+export interface ProcessStep {
+    id: number;
+    title: string;
+    description: string;
+    details: string[];
+    duration: string;
+    icon: string;
+    order: number;
+}
+
+export interface CaseStudy {
+    title: string;
+    subtitle: string;
+    description: string;
+    results: Record<string, string>;
+    testimonial: string;
+    clientName: string;
+    clientPosition: string;
+}
+
+export interface ContactForm {
+    sectionTitle: string;
+    sectionDescription: string;
+    formTitle: string;
+    submitButtonText: string;
+    successMessage: string;
+    responseTime: string;
+}
+
+// --- TYPY DLA BLOGA ---
+
+export interface BlogCategory {
+  id: number;
+  title: string;
+  name?: string;
+  slug?: string;
+  description?: string;
+}
+
+export interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  content?: string;
+  excerpt?: string;
+  published: string;
+  blog_categories?: { data: BlogCategory[] };
+  featuredImage?: { data?: { attributes: { url: string; alternativeText?: string; } } };
 }

@@ -1,47 +1,35 @@
 ---
-// src/pages/blog/index.astro - FINAL, UNIFIED ANIMATION
+// src/pages/blog/index.astro - FINAL, CORRECTED & REFINED VERSION 2.0
 import MainLayout from '../../layouts/MainLayout.astro';
-import AnimateOnScroll from '../../components/ui/AnimateOnScroll.astro'; // Nasz zunifikowany system animacji
-import { getBlogPosts, getBlogCategories, getBlogPostsCount } from '../../lib/strapi';
+import AnimateOnScroll from '../../components/ui/AnimateOnScroll.astro';
+import { getBlogPosts, getBlogCategories, getStrapiMediaUrl } from '../../lib/strapi';
+import type { BlogPost } from '../../lib/strapi';
 
 const currentPage = 1;
 const postsPerPage = 9;
 
-const [blogPosts, categories, totalPosts] = await Promise.all([
+// POPRAWKA: Usunięto getBlogPostsCount. Pobieramy tylko posty i kategorie.
+const [blogPosts, categories] = await Promise.all([
     getBlogPosts(postsPerPage, currentPage),
     getBlogCategories(),
-    getBlogPostsCount()
 ]);
 
-const fallbackPosts = [
+const fallbackPosts: BlogPost[] = [
     {
-        id: 1, slug: "optymalizacja-rozliczen-nfz-2024", title: "5 najczęstszych błędów w rozliczeniach NFZ i jak ich uniknąć",
+        id: 1, slug: "fallback-post", title: "5 najczęstszych błędów w rozliczeniach NFZ",
         excerpt: "Praktyczny przewodnik po najważniejszych pułapkach w rozliczeniach z NFZ...",
-        publishedAt: "2024-01-15", author: { name: "Dr Anna Kowalska" }, category: { name: "Rozliczenia NFZ" }, featuredImage: null
-    },
-    {
-        id: 2, slug: "rodo-w-praktyce-medycznej", title: "RODO w praktyce medycznej - kompletna lista dokumentów",
-        excerpt: "Wszystkie dokumenty RODO potrzebne w gabinecie lekarskim w 2024 roku...",
-        publishedAt: "2024-01-10", author: { name: "Mgr Piotr Nowak" }, category: { name: "Prawo medyczne" }, featuredImage: null
-    },
-    {
-        id: 3, slug: "digitalizacja-placowek-medycznych", title: "Digitalizacja placówek medycznych - krok po kroku",
-        excerpt: "Praktyczny przewodnik wdrożenia systemów cyfrowych w gabinecie lekarskim...",
-        publishedAt: "2024-01-08", author: { name: "Mgr Anna Technolog" }, category: { name: "Technologia" }, featuredImage: null
+        published: "2024-01-15T10:00:00.000Z",
+        blog_categories: [{ id: 1, name: "Rozliczenia NFZ", slug: "rozliczenia-nfz" }],
+        featuredImage: undefined,
     }
 ];
 
 const posts = blogPosts && blogPosts.length > 0 ? blogPosts : fallbackPosts;
-const totalPages = Math.ceil((totalPosts || fallbackPosts.length) / postsPerPage);
+// Prosta logika paginacji, można rozbudować w przyszłości
+const totalPages = posts.length > 0 ? 1 : 0; // Na razie pokazujemy tylko bieżącą stronę
 
 const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' });
-};
-
-const createExcerpt = (content: string, length: number = 120) => {
-    if (!content) return "";
-    const plainText = content.replace(/<[^>]*>/g, '');
-    return plainText.length > length ? plainText.substring(0, length) + '...' : plainText;
 };
 ---
 
@@ -49,7 +37,8 @@ const createExcerpt = (content: string, length: number = 120) => {
     title="Blog - Koordynuj Zdrowie | Wiedza o medycynie w praktyce"
     description="Praktyczne porady, aktualne przepisy i sprawdzone strategie dla placówek medycznych."
 >
-    <section class="py-20 sm:py-32 bg-background-light relative overflow-hidden">
+    {/* ZMIANA: Zwiększony padding-top (pt-40) dla lepszej separacji od headera */}
+    <section class="pt-40 sm:pt-48 pb-20 sm:pb-32 bg-background-light relative overflow-hidden">
         <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
             <div class="blog-main-bg-pattern absolute inset-0"></div>
         </div>
@@ -61,15 +50,15 @@ const createExcerpt = (content: string, length: number = 120) => {
                         Wiedza, która <span class="text-brand-blue">napędza</span> sukces
                     </h1>
                     <p class="text-xl text-text-muted leading-relaxed">
-                        Praktyczne porady, aktualne przepisy i sprawdzone strategie dla placówek medycznych.
+                        Praktyczne porady, aktualne przepisy i sprawdzone strategie dla placówek medycznych. 
                     </p>
                 </div>
 
                 {categories && categories.length > 0 && (
                     <div class="flex flex-wrap justify-center gap-3 mb-12">
-                        <a href="/blog" class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-brand-blue text-white transition-all hover:bg-brand-blue/90">Wszystkie</a>
+                        <a href="/blog" class="category-link active">Wszystkie</a>
                         {categories.slice(0, 5).map((category) => (
-                            <a href={`/blog/category/${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}`} class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white text-text-muted border border-slate-200 transition-all hover:border-brand-blue hover:text-brand-blue">
+                            <a href={`/blog/category/${category.slug}`} class="category-link">
                                 {category.name}
                             </a>
                         ))}
@@ -78,49 +67,43 @@ const createExcerpt = (content: string, length: number = 120) => {
 
                 <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-16">
                     {posts.map((post) => {
-                        const author = post.author || { name: "Koordynuj Zdrowie" };
-                        const category = typeof post.category === 'string' ? post.category : post.category?.name || "Artykuł";
+                        const categoryName = post.blog_categories?.[0]?.name || "Artykuł";
+                        const postDate = post.published;
+                        const imageUrl = getStrapiMediaUrl(post.featuredImage);
                         
                         return (
-                            <article class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10">
+                            <a href={`/blog/${post.slug}`} class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10">
                                 <div class="aspect-[16/9] bg-gradient-to-br from-brand-blue/10 to-brand-blue/5 rounded-t-3xl overflow-hidden relative">
-                                    {post.featuredImage && post.featuredImage.url ? (
-                                        <img src={post.featuredImage.url} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                    {imageUrl ? (
+                                        <img src={imageUrl} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                     ) : (
                                         <div class="w-full h-full flex items-center justify-center">
                                             <svg class="w-16 h-16 text-brand-blue/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                         </div>
                                     )}
                                     <div class="absolute top-4 left-4">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-blue/90 text-white">{category}</span>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-blue/90 text-white">{categoryName}</span>
                                     </div>
                                 </div>
                                 <div class="flex flex-col flex-grow p-6">
-                                    <div class="flex items-center text-sm text-text-muted mb-3">
-
-                                        <time>{formatDate(post.publishedAt ?? "")}</time>
+                                    <div class="text-sm text-text-muted mb-3">
+                                        <time>{formatDate(postDate)}</time>
                                     </div>
                                     <h2 class="text-xl font-bold text-text-primary mb-3 group-hover:text-brand-blue/90 transition-colors duration-300 line-clamp-2">{post.title}</h2>
                                     <p class="text-text-muted leading-relaxed mb-4 flex-grow line-clamp-3">{post.excerpt || "Przeczytaj więcej w pełnym artykule..."}</p>
-                                    <a href={`/blog/${post.slug}`} class="inline-flex items-center text-brand-blue font-semibold mt-auto group-hover:translate-x-1 transition-transform duration-300">
+                                    <span class="inline-flex items-center text-brand-blue font-semibold mt-auto group-hover:translate-x-1 transition-transform duration-300">
                                         Czytaj więcej
                                         <svg class="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                                    </a>
+                                    </span>
                                 </div>
-                            </article>
+                            </a>
                         );
                     })}
                 </div>
 
                 {totalPages > 1 && (
                     <div class="flex justify-center">
-                        <nav class="flex items-center space-x-2">
-                            {currentPage > 1 && <a href={`/blog/page/${currentPage - 1}`} class="pagination-btn"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></a>}
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                                <a href={pageNum === 1 ? '/blog' : `/blog/page/${pageNum}`} class={`pagination-btn ${pageNum === currentPage ? 'active' : ''}`}>{pageNum}</a>
-                            ))}
-                            {currentPage < totalPages && <a href={`/blog/page/${currentPage + 1}`} class="pagination-btn"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>}
-                        </nav>
+                        {/* Paginacja (do rozbudowy w przyszłości) */}
                     </div>
                 )}
 
@@ -140,63 +123,32 @@ const createExcerpt = (content: string, length: number = 120) => {
 </MainLayout>
 
 <style>
-    /* Usunięto style dla [data-reveal] */
-    .blog-card {
-        position: relative;
-        cursor: pointer;
+    .category-link {
+        display: inline-flex; align-items: center; padding: 0.5rem 1rem;
+        border-radius: 9999px; font-size: 0.875rem; font-weight: 500;
+        transition: all 0.2s ease-out;
     }
+    .category-link.active { background-color: var(--color-brand-blue); color: white; }
+    .category-link:not(.active) { background-color: white; color: var(--color-text-muted); border: 1px solid #e2e8f0; }
+    .category-link:not(.active):hover { border-color: var(--color-brand-blue); color: var(--color-brand-blue); }
+    .blog-card { position: relative; cursor: pointer; }
     .blog-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 1.5rem;
+        content: ''; position: absolute; inset: 0; border-radius: 1.5rem;
         background: linear-gradient(135deg, rgba(0, 169, 224, 0.05), rgba(0, 169, 224, 0.02));
-        opacity: 0;
-        transition: opacity 0.5s ease;
+        opacity: 0; transition: opacity 0.5s ease;
     }
-    .blog-card:hover::before {
-        opacity: 1;
-    }
-    .blog-card:hover {
-        transform: translateY(-4px);
-    }
+    .blog-card:hover::before { opacity: 1; }
+    .blog-card:hover { transform: translateY(-4px); }
     .pagination-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 2.5rem;
-        height: 2.5rem;
-        padding: 0.5rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
-        font-weight: 500;
-        color: #64748b;
-        background: white;
-        transition: all 0.2s;
-        text-decoration: none;
+        display: flex; align-items: center; justify-content: center;
+        min-width: 2.5rem; height: 2.5rem; padding: 0.5rem;
+        border: 1px solid #e2e8f0; border-radius: 0.5rem; font-weight: 500;
+        color: #64748b; background: white; transition: all 0.2s; text-decoration: none;
     }
-    .pagination-btn:hover {
-        border-color: var(--color-brand-blue);
-        color: var(--color-brand-blue);
-        transform: translateY(-1px);
-    }
-    .pagination-btn.active {
-        background: var(--color-brand-blue);
-        border-color: var(--color-brand-blue);
-        color: white;
-    }
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-    .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
+    .pagination-btn:hover { border-color: var(--color-brand-blue); color: var(--color-brand-blue); transform: translateY(-1px); }
+    .pagination-btn.active { background: var(--color-brand-blue); border-color: var(--color-brand-blue); color: white; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .blog-main-bg-pattern {
         background-image: 
             radial-gradient(circle at 25% 25%, rgba(0, 169, 224, 0.08) 1px, transparent 1px),
@@ -208,14 +160,5 @@ const createExcerpt = (content: string, length: number = 120) => {
     @keyframes patternFloat {
         0% { background-position: 0% 0%, 0% 0%, 0% 0%; }
         100% { background-position: 100% 100%, -100% 100%, 50% -100%; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-        .blog-card, .blog-main-bg-pattern {
-            animation: none !important;
-            transition: none !important;
-        }
-    }
-    @media (max-width: 768px) {
-        .blog-main-bg-pattern { display: none; }
     }
 </style>

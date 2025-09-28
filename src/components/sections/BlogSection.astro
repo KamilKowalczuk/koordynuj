@@ -1,7 +1,7 @@
 ---
-// src/components/sections/BlogSection.astro - FINAL, API-MATCHED VERSION
+// src/components/sections/BlogSection.astro - FIXED CATEGORIES VERSION
 import AnimateOnScroll from '../ui/AnimateOnScroll.astro';
-import { getBlogPosts, getStrapiMediaUrl } from '../../lib/strapi'; // Importujemy nową funkcję
+import { getBlogPosts, getStrapiMediaUrl } from '../../lib/strapi';
 import type { BlogPost } from '../../lib/strapi';
 
 const blogPosts: BlogPost[] | null = await getBlogPosts(3);
@@ -11,7 +11,7 @@ const fallbackPosts: BlogPost[] = [
         id: 1, slug: "fallback-post", title: "Nowe przepisy medyczne w 2024 roku",
         excerpt: "Przegląd najważniejszych zmian prawnych, które wpływają na funkcjonowanie placówek medycznych.",
         published: "2024-01-15T10:00:00.000Z",
-        blog_categories: [{ id: 1, name: "Prawo medyczne", slug: "prawo-medyczne" }],
+        blog_categories: [{ id: 1, title: "Rozliczenia NFZ", slug: "rozliczenia-nfz" }],
         featuredImage: undefined,
     }
 ];
@@ -38,12 +38,11 @@ const formatDate = (dateString: string) => {
 
             <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-12">
                 {postsToRender.map((post) => {
-                    const categoryName = post.blog_categories?.[0]?.name || "Artykuł";
+                    const categoryName = post.blog_categories?.[0]?.title || post.blog_categories?.[0]?.name || "Artykuł";
                     const postDate = post.published;
                     const imageUrl = getStrapiMediaUrl(post.featuredImage);
 
                     return (
-                        // KLUCZOWA ZMIANA: <article> zamienione na <a>
                         <a 
                             href={`/blog/${post.slug}`}
                             class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10"
@@ -67,7 +66,6 @@ const formatDate = (dateString: string) => {
                                 <h3 class="text-xl font-bold text-text-primary mb-3 group-hover:text-brand-blue/90 transition-colors duration-300 line-clamp-2">{post.title}</h3>
                                 <p class="text-text-muted leading-relaxed mb-4 flex-grow line-clamp-3">{post.excerpt || "Przeczytaj więcej..."}</p>
                                 
-                                {/* KLUCZOWA ZMIANA: <a> zamienione na <span>, ponieważ cała karta jest już linkiem */}
                                 <span class="inline-flex items-center text-brand-blue font-semibold mt-auto group-hover:translate-x-1 transition-transform duration-300">
                                     Czytaj więcej
                                     <svg class="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
@@ -87,9 +85,6 @@ const formatDate = (dateString: string) => {
     </AnimateOnScroll>
 </section>
 <style>
-    .blog-card, .blog-card::before, .blog-card:hover, .line-clamp-2, .line-clamp-3, .blog-bg-pattern, @keyframes patternDrift {
-        /* Wszystkie style pozostają bez zmian - są spójne z resztą strony */
-    }
     .blog-card { position: relative; }
     .blog-card::before {
         content: ''; position: absolute; inset: 0; border-radius: 1.5rem;

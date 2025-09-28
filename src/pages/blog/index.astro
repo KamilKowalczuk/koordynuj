@@ -1,32 +1,35 @@
 ---
-// src/pages/blog/index.astro - FINAL, CORRECTED & REFINED VERSION 2.0
+// src/pages/blog/index.astro - FIXED WITH REAL-TIME FILTERING
 import MainLayout from '../../layouts/MainLayout.astro';
 import AnimateOnScroll from '../../components/ui/AnimateOnScroll.astro';
 import { getBlogPosts, getBlogCategories, getStrapiMediaUrl } from '../../lib/strapi';
 import type { BlogPost } from '../../lib/strapi';
 
 const currentPage = 1;
-const postsPerPage = 9;
+const postsPerPage = 50; // Get more posts for filtering
 
-// POPRAWKA: Usunięto getBlogPostsCount. Pobieramy tylko posty i kategorie.
 const [blogPosts, categories] = await Promise.all([
     getBlogPosts(postsPerPage, currentPage),
     getBlogCategories(),
 ]);
+
+// Debug logging
+console.log('🔍 Categories loaded:', categories);
+if (blogPosts?.[0]?.blog_categories) {
+    console.log('🔍 First post categories:', blogPosts[0].blog_categories);
+}
 
 const fallbackPosts: BlogPost[] = [
     {
         id: 1, slug: "fallback-post", title: "5 najczęstszych błędów w rozliczeniach NFZ",
         excerpt: "Praktyczny przewodnik po najważniejszych pułapkach w rozliczeniach z NFZ...",
         published: "2024-01-15T10:00:00.000Z",
-        blog_categories: [{ id: 1, name: "Rozliczenia NFZ", slug: "rozliczenia-nfz" }],
+        blog_categories: [{ id: 1, title: "Rozliczenia NFZ", slug: "rozliczenia-nfz" }],
         featuredImage: undefined,
     }
 ];
 
 const posts = blogPosts && blogPosts.length > 0 ? blogPosts : fallbackPosts;
-// Prosta logika paginacji, można rozbudować w przyszłości
-const totalPages = posts.length > 0 ? 1 : 0; // Na razie pokazujemy tylko bieżącą stronę
 
 const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -37,7 +40,6 @@ const formatDate = (dateString: string) => {
     title="Blog - Koordynuj Zdrowie | Wiedza o medycynie w praktyce"
     description="Praktyczne porady, aktualne przepisy i sprawdzone strategie dla placówek medycznych."
 >
-    {/* ZMIANA: Zwiększony padding-top (pt-40) dla lepszej separacji od headera */}
     <section class="pt-40 sm:pt-48 pb-20 sm:pb-32 bg-background-light relative overflow-hidden">
         <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
             <div class="blog-main-bg-pattern absolute inset-0"></div>
@@ -54,25 +56,39 @@ const formatDate = (dateString: string) => {
                     </p>
                 </div>
 
+                {/* CATEGORY FILTER BUTTONS */}
                 {categories && categories.length > 0 && (
-                    <div class="flex flex-wrap justify-center gap-3 mb-12">
-                        <a href="/blog" class="category-link active">Wszystkie</a>
+                    <div class="flex flex-wrap justify-center gap-3 mb-12" id="category-filters">
+                        <button class="category-btn active" data-category="all">
+                            Wszystkie
+                        </button>
                         {categories.slice(0, 5).map((category) => (
-                            <a href={`/blog/category/${category.slug}`} class="category-link">
-                                {category.name}
-                            </a>
+                            <button class="category-btn" data-category={category.id.toString()}>
+                                {category.title}
+                            </button>
                         ))}
                     </div>
                 )}
 
-                <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-16">
+                {/* POSTS GRID */}
+                <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-16" id="posts-grid">
                     {posts.map((post) => {
-                        const categoryName = post.blog_categories?.[0]?.name || "Artykuł";
+                        // Clean category access with proper typing
+                        const firstCategory = post.blog_categories?.[0];
+                        console.log(`🔍 Post "${post.title}" category:`, firstCategory);
+                        
+                        const categoryName = firstCategory?.title || "Artykuł";
+                        const categoryId = firstCategory?.id || '';
                         const postDate = post.published;
                         const imageUrl = getStrapiMediaUrl(post.featuredImage);
                         
                         return (
-                            <a href={`/blog/${post.slug}`} class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10">
+                            <a 
+                                href={`/blog/${post.slug}`}
+                                class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10"
+                                data-category={categoryId}
+                                data-category-name={categoryName}
+                            >
                                 <div class="aspect-[16/9] bg-gradient-to-br from-brand-blue/10 to-brand-blue/5 rounded-t-3xl overflow-hidden relative">
                                     {imageUrl ? (
                                         <img src={imageUrl} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -91,6 +107,7 @@ const formatDate = (dateString: string) => {
                                     </div>
                                     <h2 class="text-xl font-bold text-text-primary mb-3 group-hover:text-brand-blue/90 transition-colors duration-300 line-clamp-2">{post.title}</h2>
                                     <p class="text-text-muted leading-relaxed mb-4 flex-grow line-clamp-3">{post.excerpt || "Przeczytaj więcej w pełnym artykule..."}</p>
+                                    
                                     <span class="inline-flex items-center text-brand-blue font-semibold mt-auto group-hover:translate-x-1 transition-transform duration-300">
                                         Czytaj więcej
                                         <svg class="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
@@ -100,12 +117,6 @@ const formatDate = (dateString: string) => {
                         );
                     })}
                 </div>
-
-                {totalPages > 1 && (
-                    <div class="flex justify-center">
-                        {/* Paginacja (do rozbudowy w przyszłości) */}
-                    </div>
-                )}
 
                 <div class="mt-20 text-center">
                     <div class="max-w-2xl mx-auto bg-gradient-to-br from-brand-blue/5 to-brand-blue/10 rounded-3xl p-8 border border-brand-blue/20">
@@ -122,15 +133,54 @@ const formatDate = (dateString: string) => {
     </section>
 </MainLayout>
 
+<script>
+// REAL-TIME CATEGORY FILTERING
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const blogCards = document.querySelectorAll('.blog-card');
+    
+    console.log('🔍 Filter setup:', categoryButtons.length, 'buttons,', blogCards.length, 'cards');
+    
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            const target = event.currentTarget as HTMLElement;
+            const selectedCategory = target.getAttribute('data-category');
+            console.log('🔍 Filtering by category:', selectedCategory);
+            
+            // Update button states
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            target.classList.add('active');
+            
+            // Filter posts
+            let visibleCount = 0;
+            blogCards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                const shouldShow = selectedCategory === 'all' || cardCategory === selectedCategory;
+                
+                if (shouldShow) {
+                    (card as HTMLElement).style.display = 'block';
+                    visibleCount++;
+                } else {
+                    (card as HTMLElement).style.display = 'none';
+                }
+            });
+            
+            console.log(`✅ Showing ${visibleCount} posts for category: ${selectedCategory}`);
+        });
+    });
+});
+</script>
+
 <style>
-    .category-link {
+    .category-btn {
         display: inline-flex; align-items: center; padding: 0.5rem 1rem;
         border-radius: 9999px; font-size: 0.875rem; font-weight: 500;
-        transition: all 0.2s ease-out;
+        transition: all 0.2s ease-out; cursor: pointer; border: none;
     }
-    .category-link.active { background-color: var(--color-brand-blue); color: white; }
-    .category-link:not(.active) { background-color: white; color: var(--color-text-muted); border: 1px solid #e2e8f0; }
-    .category-link:not(.active):hover { border-color: var(--color-brand-blue); color: var(--color-brand-blue); }
+    .category-btn.active { background-color: var(--color-brand-blue); color: white; }
+    .category-btn:not(.active) { background-color: white; color: var(--color-text-muted); border: 1px solid #e2e8f0; }
+    .category-btn:not(.active):hover { border-color: var(--color-brand-blue); color: var(--color-brand-blue); }
+    
     .blog-card { position: relative; cursor: pointer; }
     .blog-card::before {
         content: ''; position: absolute; inset: 0; border-radius: 1.5rem;
@@ -139,16 +189,10 @@ const formatDate = (dateString: string) => {
     }
     .blog-card:hover::before { opacity: 1; }
     .blog-card:hover { transform: translateY(-4px); }
-    .pagination-btn {
-        display: flex; align-items: center; justify-content: center;
-        min-width: 2.5rem; height: 2.5rem; padding: 0.5rem;
-        border: 1px solid #e2e8f0; border-radius: 0.5rem; font-weight: 500;
-        color: #64748b; background: white; transition: all 0.2s; text-decoration: none;
-    }
-    .pagination-btn:hover { border-color: var(--color-brand-blue); color: var(--color-brand-blue); transform: translateY(-1px); }
-    .pagination-btn.active { background: var(--color-brand-blue); border-color: var(--color-brand-blue); color: white; }
+    
     .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    
     .blog-main-bg-pattern {
         background-image: 
             radial-gradient(circle at 25% 25%, rgba(0, 169, 224, 0.08) 1px, transparent 1px),
@@ -157,6 +201,7 @@ const formatDate = (dateString: string) => {
         background-size: 150px 150px, 200px 200px, 180px 180px;
         animation: patternFloat 40s linear infinite;
     }
+    
     @keyframes patternFloat {
         0% { background-position: 0% 0%, 0% 0%, 0% 0%; }
         100% { background-position: 100% 100%, -100% 100%, 50% -100%; }

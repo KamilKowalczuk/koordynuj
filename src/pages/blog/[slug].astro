@@ -1,5 +1,5 @@
 ---
-// src/pages/blog/[slug].astro - FINAL, FULLY STYLED & CONSISTENT VERSION
+// src/pages/blog/[slug].astro - FIXED CATEGORIES VERSION
 import MainLayout from '../../layouts/MainLayout.astro';
 import AnimateOnScroll from '../../components/ui/AnimateOnScroll.astro';
 import { getBlogPosts, getBlogPost, getRelatedBlogPosts, getStrapiMediaUrl } from '../../lib/strapi';
@@ -48,7 +48,7 @@ const createExcerpt = (content: string, length: number = 100) => {
                 {category && (
                     <div class="mb-6">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-blue/10 text-brand-blue">
-                            {category.name}
+                            {category.title}
                         </span>
                     </div>
                 )}
@@ -102,7 +102,7 @@ const createExcerpt = (content: string, length: number = 100) => {
             <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
               {relatedPosts.slice(0, 3).map((rp) => {
                   const relatedImageUrl = getStrapiMediaUrl(rp.featuredImage);
-                  const relatedCategoryName = rp.blog_categories?.[0]?.name || "Artykuł";
+                  const relatedCategoryName = rp.blog_categories?.[0]?.title || "Artykuł";
                   return (
                       <a href={`/blog/${rp.slug}`} class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10">
                           <div class="aspect-[16/9] bg-gradient-to-br from-brand-blue/10 to-brand-blue/5 rounded-t-3xl overflow-hidden relative">

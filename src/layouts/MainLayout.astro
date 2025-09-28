@@ -1,5 +1,5 @@
 ---
-// src/layouts/MainLayout.astro
+// src/layouts/MainLayout.astro - FIXED SCROLL RESTORATION
 import '../styles/global.css';
 import ServicePanel from '../components/ui/ServicePanel.svelte';
 import Header from '../components/layout/Header.svelte';
@@ -7,15 +7,14 @@ import Footer from '../components/layout/Footer.astro';
 import Logo from '../components/ui/Logo.astro';
 
 interface Props {
-    title: string;
-    description: string;
+  title: string;
+  description: string;
 }
 
 const { title, description } = Astro.props;
 
 // Sprawdzamy, czy jesteśmy na stronie głównej
 const isHomepage = Astro.url.pathname === '/';
-
 const siteTitle = title || "Koordynuj Zdrowie";
 const siteDescription = description || "Zarządzanie medycyną. Zredukowane do perfekcji.";
 const themeColor = "#00A9E0";
@@ -23,79 +22,114 @@ const themeColor = "#00A9E0";
 
 <!doctype html>
 <html lang="pl">
-    <head>
-        {/* ... (reszta sekcji head bez zmian) ... */}
-        <meta charset="UTF-8" />
-        <meta name="description" content={siteDescription} />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <meta name="generator" content={Astro.generator} />
-        <title>{siteTitle}</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content={siteDescription} />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{siteTitle}</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  
+  <meta property="og:title" content={siteTitle} />
+  <meta property="og:description" content={siteDescription} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={siteTitle} />
+  <meta name="twitter:description" content={siteDescription} />
+  <meta name="theme-color" content={themeColor} />
+</head>
+<body class="bg-background-light text-text-primary font-sans antialiased">
+  <Header client:load>
+    <div slot="logo">
+      <a href="/" class="flex-shrink-0">
+        <Logo isHomepage={isHomepage} />
+      </a>
+    </div>
+  </Header>
+  
+  <main id="top">
+    <slot />
+  </main>
+  
+  <Footer />
+  <ServicePanel client:load />
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-        
-        <meta property="og:title" content={siteTitle} />
-        <meta property="og:description" content={siteDescription} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={siteTitle} />
-        <meta name="twitter:description" content={siteDescription} />
-        
-        <meta name="theme-color" content={themeColor} />
-    </head>
-    <body class="bg-background-light text-text-primary font-sans antialiased">
-        <Header client:load>
-            <div slot="logo">
-                <a href="/" class="flex-shrink-0">
-                    {/* Przekazujemy nową właściwość do komponentu Logo */}
-                    <Logo isHomepage={isHomepage} />
-                </a>
-            </div>
-        </Header>
+  <script>
+    // INTELLIGENT SCROLL RESTORATION
+    document.addEventListener('DOMContentLoaded', () => {
+      // Enable browser's native scroll restoration for better back/forward navigation
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'auto';
+      }
 
-        <main id="top">
-            <slot />
-        </main>
+      // Save scroll position before navigation (fallback for older browsers)
+      window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+      });
 
-        <Footer />
-        <ServicePanel client:load />
-        
-        <script>
-            // ... (reszta skryptu bez zmian) ...
-            if (history.scrollRestoration) {
-                history.scrollRestoration = 'manual';
-            } else {
-                window.onbeforeunload = () => {
-                    window.scrollTo(0, 0);
-                };
-            }
+      // Handle anchor links with smooth scrolling (internal page navigation only)
+      const anchorLinks = document.querySelectorAll('a[href^="#"]');
+      anchorLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          const href = link.getAttribute('href');
+          
+          if (href === '#') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
 
-            document.addEventListener('DOMContentLoaded', () => {
-                const links = document.querySelectorAll('a[href^="#"]');
-                links.forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        const href = link.getAttribute('href');
-                        if (href === '#') {
-                            e.preventDefault();
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                            return;
-                        }
-
-                        const targetId = href?.substring(1);
-                        const targetElement = document.getElementById(targetId || '');
-                        
-                        if (targetElement) {
-                            e.preventDefault();
-                            targetElement.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }
-                    });
-                });
+          const targetId = href?.substring(1);
+          const targetElement = document.getElementById(targetId || '');
+          
+          if (targetElement) {
+            e.preventDefault();
+            
+            // Smooth scroll to target element
+            targetElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
             });
-        </script>
-    </body>
+            
+            // Update URL without triggering navigation
+            if (window.location.pathname === '/') {
+              window.history.replaceState(null, '', href);
+            }
+          }
+        });
+      });
+
+      // Handle "Back to Homepage" navigation from blog pages
+      const homeLinks = document.querySelectorAll('a[href="/"]');
+      homeLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          // Let browser handle navigation normally for better scroll restoration
+          // The browser will now remember scroll position on homepage
+        });
+      });
+
+      // Handle blog navigation links that should preserve scroll position
+      const blogLinks = document.querySelectorAll('a[href="/blog"]');
+      blogLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          // Save current scroll position for when user returns
+          sessionStorage.setItem('homepageScrollPosition', window.scrollY.toString());
+        });
+      });
+
+      // Restore scroll position when returning from blog (for older browsers)
+      if (window.location.pathname === '/' && !window.location.hash) {
+        const savedPosition = sessionStorage.getItem('homepageScrollPosition');
+        if (savedPosition && window.performance?.navigation?.type === 2) { // Back navigation
+          window.scrollTo(0, parseInt(savedPosition));
+          sessionStorage.removeItem('homepageScrollPosition');
+        }
+      }
+    });
+  </script>
+</body>
 </html>

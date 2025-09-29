@@ -37,7 +37,7 @@
         slides-per-view="1"
         space-between="30"
         loop="true"
-        autoplay-delay="8000"
+        autoplay-delay="12000"
         pagination-clickable="true"
         keyboard-enabled="true"
         grab-cursor="true"

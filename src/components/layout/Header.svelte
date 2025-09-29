@@ -5,6 +5,7 @@
     let isOpen = false;
 
     const navLinks = [
+        { href: '/blog', label: 'Blog' },
         { href: '#problemy', label: 'Diagnoza' },
         { href: '#oferta', label: 'Oferta' },
         { href: '#dowod', label: 'Rezultaty' },

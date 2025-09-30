@@ -67,9 +67,9 @@
             <header class="flex items-start justify-between gap-4 p-6 border-b border-slate-200/80 flex-shrink-0">
                 <div>
                     <h2 id="service-panel-title" class="text-2xl font-bold text-brand-blue">{currentService.title}</h2>
-                    <div class="header-description strapi-content mt-1 pr-4">
+                    <!-- <div class="header-description strapi-content mt-1 pr-4">
                         {@html sanitizedContent.shortDescription}
-                    </div>
+                    </div> -->
                 </div>
                 <button bind:this={closeButton} on:click={closePanel} class="p-2 rounded-full hover:bg-slate-200/80 transition-colors flex-shrink-0" aria-label="Zamknij panel">
                     <svg class="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>

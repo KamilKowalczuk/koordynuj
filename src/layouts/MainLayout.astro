@@ -1,5 +1,5 @@
 ---
-// src/layouts/MainLayout.astro - FIXED SCROLL RESTORATION
+// src/layouts/MainLayout.astro - PERFECT: Instant scroll restoration, no flash
 import '../styles/global.css';
 import ServicePanel from '../components/ui/ServicePanel.svelte';
 import Header from '../components/layout/Header.svelte';
@@ -41,6 +41,57 @@ const themeColor = "#00A9E0";
   <meta name="twitter:title" content={siteTitle} />
   <meta name="twitter:description" content={siteDescription} />
   <meta name="theme-color" content={themeColor} />
+
+  <!-- CRITICAL: Inline script - wykonuje się NATYCHMIAST, zanim strona się wyrenderuje -->
+  <script is:inline>
+    // Wyłączamy automatyczne scroll restoration
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // Funkcja wykrywania typu nawigacji
+    function getNavigationType() {
+      const navEntry = performance.getEntriesByType('navigation')[0];
+      if (navEntry) return navEntry.type;
+      const perfNav = performance.navigation;
+      if (perfNav.type === 0) return 'navigate';
+      if (perfNav.type === 1) return 'reload';
+      if (perfNav.type === 2) return 'back_forward';
+      return 'navigate';
+    }
+
+    // NATYCHMIASTOWA akcja - PRZED renderowaniem
+    (function() {
+      const navType = getNavigationType();
+      const hasHash = window.location.hash;
+      
+      if (navType === 'reload') {
+        // RELOAD: Scrolluj na górę natychmiast
+        if (hasHash) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+        window.scrollTo(0, 0);
+        console.log('🔄 Reload → instant scroll to top');
+        
+      } else if (navType === 'back_forward') {
+        // BACK/FORWARD: Przywróć pozycję NATYCHMIAST z history.state
+        const savedScroll = history.state?.scrollY;
+        if (savedScroll !== undefined) {
+          // Scrollujemy NATYCHMIAST, bez czekania na load
+          window.scrollTo(0, savedScroll);
+          console.log(`⬅️ Back/Forward → instant restore to ${savedScroll}`);
+        } else {
+          // Fallback na sessionStorage (dla compatibility)
+          const fallbackScroll = sessionStorage.getItem('scroll_' + window.location.pathname);
+          if (fallbackScroll) {
+            window.scrollTo(0, parseInt(fallbackScroll));
+            console.log(`⬅️ Back/Forward → fallback restore to ${fallbackScroll}`);
+          }
+        }
+      }
+      // Dla 'navigate' nic nie robimy - zostanie na górze lub scrolluje do hash później
+    })();
+  </script>
 </head>
 <body class="bg-background-light text-text-primary font-sans antialiased">
   <Header client:load>
@@ -59,20 +110,40 @@ const themeColor = "#00A9E0";
   <ServicePanel client:load />
 
   <script>
-    // INTELLIGENT SCROLL RESTORATION
+    // === ZAPISYWANIE POZYCJI PRZED NAWIGACJĄ ===
+    
+    // Zapisujemy w history.state (najszybszy dostęp)
+    let scrollSaveTimeout: ReturnType<typeof setTimeout>;
+    
+    function saveScrollPosition() {
+      clearTimeout(scrollSaveTimeout);
+      scrollSaveTimeout = setTimeout(() => {
+        const currentScroll = window.scrollY;
+        const currentPath = window.location.pathname;
+        
+        // Zapisz w history.state (primary)
+        history.replaceState(
+          { ...history.state, scrollY: currentScroll }, 
+          ''
+        );
+        
+        // Zapisz również w sessionStorage (fallback)
+        sessionStorage.setItem(`scroll_${currentPath}`, currentScroll.toString());
+        
+        console.log(`💾 Saved scroll: ${currentScroll} for ${currentPath}`);
+      }, 100); // Debounce
+    }
+
+    // Zapisz pozycję przy scrollowaniu (debounced)
+    window.addEventListener('scroll', saveScrollPosition, { passive: true });
+    
+    // Zapisz pozycję przed nawigacją
+    window.addEventListener('beforeunload', saveScrollPosition);
+
+    // === OBSŁUGA ANCHOR LINKS (smooth scrolling) ===
     document.addEventListener('DOMContentLoaded', () => {
-      // Enable browser's native scroll restoration for better back/forward navigation
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'auto';
-      }
-
-      // Save scroll position before navigation (fallback for older browsers)
-      window.addEventListener('beforeunload', () => {
-        sessionStorage.setItem('scrollPosition', window.scrollY.toString());
-      });
-
-      // Handle anchor links with smooth scrolling (internal page navigation only)
       const anchorLinks = document.querySelectorAll('a[href^="#"]');
+      
       anchorLinks.forEach(link => {
         link.addEventListener('click', (e) => {
           const href = link.getAttribute('href');
@@ -89,44 +160,28 @@ const themeColor = "#00A9E0";
           if (targetElement) {
             e.preventDefault();
             
-            // Smooth scroll to target element
+            // Smooth scroll to target
             targetElement.scrollIntoView({
               behavior: 'smooth',
               block: 'start'
             });
             
-            // Update URL without triggering navigation
+            // Update URL with hash (tylko na stronie głównej)
             if (window.location.pathname === '/') {
-              window.history.replaceState(null, '', href);
+              history.replaceState({ ...history.state }, '', href);
             }
           }
         });
       });
 
-      // Handle "Back to Homepage" navigation from blog pages
-      const homeLinks = document.querySelectorAll('a[href="/"]');
-      homeLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          // Let browser handle navigation normally for better scroll restoration
-          // The browser will now remember scroll position on homepage
-        });
-      });
-
-      // Handle blog navigation links that should preserve scroll position
-      const blogLinks = document.querySelectorAll('a[href="/blog"]');
-      blogLinks.forEach(link => {
-        link.addEventListener('click', () => {
-          // Save current scroll position for when user returns
-          sessionStorage.setItem('homepageScrollPosition', window.scrollY.toString());
-        });
-      });
-
-      // Restore scroll position when returning from blog (for older browsers)
-      if (window.location.pathname === '/' && !window.location.hash) {
-        const savedPosition = sessionStorage.getItem('homepageScrollPosition');
-        if (savedPosition && window.performance?.navigation?.type === 2) { // Back navigation
-          window.scrollTo(0, parseInt(savedPosition));
-          sessionStorage.removeItem('homepageScrollPosition');
+      // === OBSŁUGA DEEP LINKS (hash w URL przy pierwszym załadowaniu) ===
+      const navType = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navType?.type === 'navigate' && window.location.hash) {
+        const targetElement = document.getElementById(window.location.hash.substring(1));
+        if (targetElement) {
+          setTimeout(() => {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
         }
       }
     });

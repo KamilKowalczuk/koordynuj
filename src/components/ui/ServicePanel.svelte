@@ -18,7 +18,6 @@
             isOpen = true;
             document.body.style.overflow = 'hidden';
 
-            // KROK 1: Dodajemy shortDescription do listy treści do sanitacji
             sanitizedContent = {
                 shortDescription: DOMPurify.sanitize(service.shortDescription || ''),
                 whyWorthIt: DOMPurify.sanitize(service.whyWorthIt || ''),
@@ -39,7 +38,6 @@
         }
     });
 
-    // Reszta skryptu bez zmian
     function closePanel() { activeService.set(null); }
     function handleClickOutside(event: MouseEvent) { if (event.currentTarget === event.target) closePanel(); }
     function handleBackdropKeyDown(event: KeyboardEvent) { if ((event.key === 'Enter' || event.key === ' ') && event.currentTarget === event.target) closePanel(); }
@@ -81,7 +79,7 @@
             <div class="overflow-y-auto p-8 flex-grow">
 				<div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
 					
-					<div class="strapi-content">
+					<div class="strapi-content panel-body-content">
 						<h4>Dlaczego warto?</h4>
 						{@html sanitizedContent.whyWorthIt}
 						
@@ -100,7 +98,7 @@
 						</div>
 					</div>
 
-					<div class="strapi-content lg:border-l lg:border-slate-200/80 lg:pl-12">
+					<div class="strapi-content panel-body-content lg:border-l lg:border-slate-200/80 lg:pl-12">
 						<h4>Zakres naszej oferty</h4>
 						{@html sanitizedContent.scope}
 
@@ -110,7 +108,7 @@
 						</div>
 						
 						{#if sanitizedContent.collaborationSummary}
-							<div class="summary-box mt-8">{@html sanitizedContent.collaborationSummary}</div>
+							<div class="strapi-content panel-body-content summary-box mt-8">{@html sanitizedContent.collaborationSummary}</div>
 						{/if}
 					</div>
 
@@ -119,7 +117,7 @@
 
             <footer class="flex-shrink-0 border-t border-slate-200/80 bg-white/50 backdrop-blur-sm p-6 text-center rounded-b-2xl">
                 <a href="#kontakt" on:click={closePanel} class="btn-primary inline-flex items-center group">
-                    Porozmawiajmy o korzyściach dla Ciebie
+                    Umów konsultację
                     <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -130,10 +128,43 @@
 {/if}
 
 <style>
-    .service-panel { opacity: 0; transition: opacity 0.3s ease; }
-    .service-panel.open { opacity: 1; }
-    .panel-content { opacity: 0; transform: scale(0.95); transition: all 0.3s ease-in-out; }
-    .service-panel.open .panel-content { opacity: 1; transform: scale(1); }
+    /* === ANIMACJE PANELU === */
+    .service-panel { 
+        opacity: 0; 
+        transition: opacity 0.3s ease; 
+    }
+    .service-panel.open { 
+        opacity: 1; 
+    }
+    .panel-content { 
+        opacity: 0; 
+        transform: scale(0.95); 
+        transition: all 0.3s ease-in-out; 
+    }
+    .service-panel.open .panel-content { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
     
-
+    /* === TYPOGRAPHY FIX - TYLKO GŁÓWNA ZAWARTOŚĆ === */
+    /* Nadpisujemy style TYLKO dla .panel-body-content (głównej treści panelu) */
+    /* Header (.header-description) pozostaje bez zmian! */
+    
+    :global(.panel-body-content) {
+        font-size: 1.0625rem !important;  /* 17px - sweet spot między 16 a 18 */
+        line-height: 1.625 !important;      /* Lepszy oddech niż 1.625 */
+    }
+    
+    :global(.panel-body-content p) {
+        line-height: 1.625 !important;
+        margin-bottom: 1rem;
+    }
+    
+    :global(.panel-body-content p:last-child) {
+        margin-bottom: 0;
+    }
+    
+    /* Nagłówki h4/h5 pozostają bez zmian - są już dobre */
+    /* Fajki i strzałki pozostają bez zmian - działają z global.css */
+    /* Summary box pozostaje bez zmian */
 </style>

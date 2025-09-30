@@ -130,14 +130,22 @@ const createExcerpt = (content: string, length: number = 100) => {
 </MainLayout>
 
 <style is:global>
+  /* === TYPOGRAPHY FIX: Spójność ze ServicePanel === */
+  /* ZMIENIONE: font-size i line-height dla głównej treści */
   .prose-custom {
     color: var(--color-text-primary);
-    line-height: 1.75;
+    font-size: 1.0625rem !important;  /* 17px - jak w ServicePanel */
+    line-height: 1.625 !important;      /* Jak w ServicePanel */
   }
+  
   .prose-custom p {
+    line-height: 1.7 !important;      /* Jak w ServicePanel */
     margin-top: 1.25em;
     margin-bottom: 1.25em;
   }
+  
+  /* === RESZTA BEZ ZMIAN === */
+  /* Nagłówki - zachowane kolory brand-blue */
   .prose-custom h2, .prose-custom h3, .prose-custom h4 {
     color: var(--color-text-primary);
     font-weight: 700;

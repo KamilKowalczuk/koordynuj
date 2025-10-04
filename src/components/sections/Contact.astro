@@ -1,54 +1,47 @@
 ---
-// src/components/sections/Contact.astro - WERSJA ZINTEGROWANA ZE STRAPI
 import AnimateOnScroll from '../ui/AnimateOnScroll.astro';
 import ContactForm from '../ui/ContactForm.svelte';
-import { getGlobalSettings } from '../../lib/strapi';
+import { getGlobalSettings, getContactForm } from '../../lib/strapi';
+import { fixOrphans } from '../../lib/typography';
 
-// Krok 1: Pobieramy dane globalne ze Strapi
 const settings = await getGlobalSettings();
+const formSettings = await getContactForm();
 
-// Krok 2: Definiujemy dane zapasowe
-const fallbackSettings = {
+const fallbackData = {
     contactPhone: "+48 535 604 904",
     contactEmail: "kontakt@koordynujzdrowie.pl",
+    sectionTitle: "Zacznijmy koordynować Twój sukces.",
+    sectionDescription: "Wypełnij formularz, a nasz strateg skontaktuje się z Tobą w ciągu **24h**, aby umówić bezpłatną konsultację.",
+    successMessage: "Dziękujemy za zgłoszenie! Skontaktujemy się z Tobą w ciągu 24h."
 };
 
-// Używamy danych ze Strapi lub danych zapasowych
-const contactData = settings || fallbackSettings;
+const contactData = settings || fallbackData;
+const formData = formSettings || fallbackData;
+
+// Ustawiamy docelowy email - jeśli jest w globalnych ustawieniach, użyj go, w przeciwnym razie użyj zapasowego
+const recipientEmail = settings?.contactEmail || fallbackData.contactEmail;
 ---
 
 <section id="kontakt" class="py-20 sm:py-32 bg-background-muted relative overflow-hidden">
-    <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
-        <div class="contact-bg-pattern absolute inset-0"></div>
-    </div>
-    <div class="absolute inset-0 opacity-5">
-        <svg class="w-full h-full" viewBox="0 0 1200 800">
-            <g class="animate-convergence">
-                <path d="M0,100 Q600,350 1200,200" stroke="#00A9E0" stroke-width="1" fill="none"/>
-                <path d="M0,300 Q600,380 1200,400" stroke="#00A9E0" stroke-width="1" fill="none"/>
-                <path d="M0,500 Q600,420 1200,600" stroke="#00A9E0" stroke-width="1" fill="none"/>
-                <path d="M0,700 Q600,450 1200,800" stroke="#00A9E0" stroke-width="1" fill="none"/>
-            </g>
-            <circle cx="600" cy="400" r="3" fill="#00A9E0" opacity="0.4" class="animate-pulse-center"/>
-        </svg>
-    </div>
-
     <AnimateOnScroll>
         <div class="relative z-10 max-w-4xl mx-auto px-4">
             <div class="text-center mb-12">
-                <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
-                    Zacznijmy koordynować Twój sukces.
-                </h2>
-                <p class="section-subtitle">
-                    Wypełnij formularz, skontaktujemy się z Tobą w ciągu <span class="font-semibold text-brand-blue">24h</span>, aby umówić bezpłatną konsultację.
-                </p>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter" set:html={fixOrphans(formData.sectionTitle)}></h2>
+                <div class="section-subtitle strapi-content" set:html={fixOrphans(formData.sectionDescription)}></div>
             </div>
 
             <div class="max-w-2xl mx-auto">
-                <ContactForm client:load />
+                <ContactForm 
+                    client:load 
+                    recipientEmail={recipientEmail}
+                    successMessageHTML={formData.successMessage}
+                />
             </div>
 
             <div class="text-center mt-16">
+                </div>
+        </div>
+                    <div class="text-center mt-16">
                 <p class="text-text-muted mb-6">Lub skontaktuj się z nami bezpośrednio:</p>
                 <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
                     
@@ -73,7 +66,6 @@ const contactData = settings || fallbackSettings;
                     )}
                 </div>
             </div>
-        </div>
     </AnimateOnScroll>
 </section>
 
@@ -107,6 +99,10 @@ const contactData = settings || fallbackSettings;
         background-size: 160px 160px, 240px 240px, 200px 200px;
         animation: patternDrift 40s linear infinite;
     }
+    .section-subtitle :global(strong) {
+    color: rgb(var(--brand-blue));
+  }
+    
     @keyframes convergence {
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-5px); }

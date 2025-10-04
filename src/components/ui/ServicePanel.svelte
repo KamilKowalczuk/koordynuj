@@ -3,6 +3,7 @@
     import { activeService } from '../../lib/serviceStore';
     import type { Service } from '../../types';
     import DOMPurify from 'isomorphic-dompurify';
+    import { fixOrphans } from '../../lib/typography';
 
     let panelContainer: HTMLElement;
     let closeButton: HTMLButtonElement;
@@ -19,13 +20,13 @@
             document.body.style.overflow = 'hidden';
 
             sanitizedContent = {
-                shortDescription: DOMPurify.sanitize(service.shortDescription || ''),
-                whyWorthIt: DOMPurify.sanitize(service.whyWorthIt || ''),
-                scope: DOMPurify.sanitize(service.scope || ''),
-                benefitsFacility: DOMPurify.sanitize(service.benefitsFacility || ''),
-                benefitsPatients: DOMPurify.sanitize(service.benefitsPatients || ''),
-                collaborationModel: DOMPurify.sanitize(service.collaborationModel || ''),
-                collaborationSummary: DOMPurify.sanitize(service.collaborationSummary || '')
+                shortDescription: DOMPurify.sanitize(fixOrphans(service.shortDescription)),
+                whyWorthIt: DOMPurify.sanitize(fixOrphans(service.whyWorthIt)),
+                scope: DOMPurify.sanitize(fixOrphans(service.scope)),
+                benefitsFacility: DOMPurify.sanitize(fixOrphans(service.benefitsFacility)),
+                benefitsPatients: DOMPurify.sanitize(fixOrphans(service.benefitsPatients)),
+                collaborationModel: DOMPurify.sanitize(fixOrphans(service.collaborationModel)),
+                collaborationSummary: DOMPurify.sanitize(fixOrphans(service.collaborationSummary))
             };
             
             await tick();

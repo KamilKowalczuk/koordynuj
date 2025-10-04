@@ -1,13 +1,52 @@
 ---
-// src/components/sections/CaseStudy.astro - FINAL, UNIFIED VERSION
+// src/components/sections/CaseStudy.astro - WERSJA W PEŁNI ZINTEGROWANA ZE STRAPI
 import AnimateOnScroll from '../ui/AnimateOnScroll.astro';
 import AnimatedCounter from '../ui/AnimatedCounter.svelte';
+import { getCaseStudy } from '../../lib/strapi';
+import { fixOrphans } from '../../lib/typography';
 
-const metrics = [
-    { value: 27, suffix: "%", prefix: "+", description: "wzrost przychodów z programów profilaktycznych", color: "blue" },
-    { value: 15, suffix: "h", prefix: "-", description: "oszczędności czasu na administracji tygodniowo", color: "green" },
-    { value: 100, suffix: "%", prefix: "", description: "zgodność rozliczeń po 3 miesiącach", color: "blue" }
-];
+// Krok 1: Pobieramy dane z CMS
+const caseStudyData = await getCaseStudy();
+
+// Krok 2: Definiujemy dane zapasowe na wypadek problemów z API
+const fallbackData = {
+    title: "Precyzja, którą można zmierzyć.",
+    subtitle: "Chcesz osiągnąć podobne <span class=\"font-semibold text-brand-blue\">wymierne rezultaty</span>?",
+    description: "", // To pole nie jest obecnie używane w komponencie
+    results: [
+        { value: 27, suffix: "%", prefix: "+", description: "wzrost przychodów z programów profilaktycznych", color: "blue" },
+        { value: 15, suffix: "h", prefix: "-", description: "oszczędności czasu na administracji tygodniowo", color: "green" },
+        { value: 100, suffix: "%", prefix: "", description: "zgodność rozliczeń po 3 miesiącach", color: "blue" }
+    ],
+    testimonial: "\"Współpraca, która realnie przekłada się na wyniki finansowe i spokój w zarządzaniu. Zespół Koordynuj Zdrowie to partner, a nie tylko dostawca.\"",
+    clientName: "Dr Janusz Kowalski",
+    clientPosition: "Dyrektor, NZOZ \"Nowa Jakość\""
+};
+
+// Krok 3: Łączymy dane i przygotowujemy metryki
+const data = caseStudyData || fallbackData;
+
+let metrics = fallbackData.results;
+if (data.results && typeof data.results === 'string') {
+    try {
+        // Parsujemy JSON ze Strapi do tablicy obiektów
+        metrics = JSON.parse(data.results);
+    } catch (e) {
+        console.error("Błąd parsowania pola 'results' ze Strapi. Użyto danych zapasowych.", e);
+    }
+} else if (Array.isArray(data.results)) {
+    metrics = data.results;
+}
+
+// Prosty trick do wygenerowania inicjałów
+const getInitials = (name: string) => {
+    if (!name) return 'KZ';
+    const parts = name.split(' ');
+    if (parts.length > 1) {
+        return parts[0].charAt(0) + parts[1].charAt(0);
+    }
+    return name.substring(0, 2);
+}
 ---
 
 <section id="dowod" class="py-20 sm:py-32 bg-background-muted relative overflow-hidden">
@@ -33,13 +72,11 @@ const metrics = [
     <AnimateOnScroll>
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto">
-                <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary tracking-tighter mb-14 md:mb-20">
-                    Precyzja, którą można zmierzyć.
-                </h2>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary tracking-tighter mb-14 md:mb-20" set:html={data.title}></h2>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 md:mb-24">
-                {metrics.map((metric) => (
+                {metrics.map((metric: any) => (
                     <div class="metric-card card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10 text-center">
                         <div class="mb-4 counter-container">
                             <AnimatedCounter 
@@ -64,16 +101,16 @@ const metrics = [
                             <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
                         </svg>
                     </div>
-                    <blockquote class="text-xl md:text-2xl text-text-primary leading-relaxed mb-6 pl-8 quote-text">
-                        "Współpraca, która realnie przekłada się na wyniki finansowe i spokój w zarządzaniu. Zespół Koordynuj Zdrowie to partner, a nie tylko dostawca."
+                    <blockquote class="testimonial-quote strapi-content mb-6 pl-8">
+                        <div set:html={fixOrphans(data.testimonial)}></div>
                     </blockquote>
                     <div class="flex items-center pl-8 author-info">
                         <div class="avatar w-12 h-12 bg-gradient-to-br from-brand-blue to-brand-blue/80 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-110">
-                            <span class="text-white font-bold">JK</span>
+                            <span class="text-white font-bold">{getInitials(data.clientName)}</span>
                         </div>
                         <div class="ml-4">
-                            <p class="font-semibold text-text-primary">Dr Janusz Kowalski</p>
-                            <p class="text-text-muted">Dyrektor, NZOZ "Nowa Jakość"</p>
+                            <p class="font-semibold text-text-primary">{data.clientName}</p>
+                            <p class="text-text-muted">{data.clientPosition}</p>
                         </div>
                     </div>
                     <div class="absolute bottom-4 right-4 w-24 h-24 bg-gradient-to-br from-brand-blue/5 to-transparent rounded-full decorative-blob"></div>
@@ -81,9 +118,7 @@ const metrics = [
             </div>
 
             <div class="text-center mt-16 md:mt-24">
-                <p class="text-lg text-text-muted mb-6">
-                    Chcesz osiągnąć podobne <span class="font-semibold text-brand-blue">wymierne rezultaty</span>?
-                </p>
+                <p class="text-lg text-text-muted mb-6" set:html={data.subtitle}></p>
                 <a href="#kontakt" class="btn-primary inline-flex items-center group">
                     Sprawdź potencjał swojej placówki
                     <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -240,8 +240,6 @@
     line-height: var(--text-base--line-height);
     color: var(--color-text-muted);
   }
-
-  /* --- Typografia wewnątrz .strapi-content --- */
   .strapi-content h4 {
     font-size: var(--text-lg);
     line-height: var(--text-lg--line-height);
@@ -263,47 +261,87 @@
   }
   .strapi-content strong,
   .strapi-content b {
-    font-weight: 600;
+    font-weight: 600; /* Przywracamy pogrubienie */
     color: var(--color-text-primary);
   }
   .strapi-content em,
   .strapi-content i {
     font-style: italic;
   }
-
-  /* --- Listy (System Kontekstowy) --- */
- /* 1. DOMYŚLNY STYL: dla każdej listy `ul` bez specjalnego kontekstu. */
-  .strapi-content ul {
-    @apply space-y-2 mb-6 list-disc pl-5;
+  
+  /* --- 2. Nowa, specjalna klasa-modyfikator do niszczenia stylów inline --- */
+  .strapi-reset * {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    white-space: normal !important;
   }
 
-  /* 2. RESET: dla list w naszych specjalnych kontenerach. */
+  /* --- 3. Dedykowane style dla cytatu w opinii --- */
+  .testimonial-quote {
+    color: var(--color-text-primary) !important;
+    font-style: italic;
+    font-size: var(--text-xl) !important;
+    line-height: 1.625 !important;
+    word-break: break-word;
+    /* hyphens: auto; */
+  }
+  .testimonial-quote p {
+    margin: 0;
+  }
+  @media (min-width: 768px) { /* breakpoint 'md' */
+    .testimonial-quote {
+      font-size: var(--text-2xl) !important;
+      line-height: 1.6 !important;
+    }
+  }
+  .testimonial-quote * {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    white-space: normal !important;
+  }
+  /* --- 4. System kontekstowy dla list (bez zmian, jest idealny) --- */
   .benefits-list ul,
   .steps-list ul {
-    @apply list-none p-0;
+    list-style: none;
+    padding-left: 0;
+    margin-top: var(--spacing-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
   }
-  
-  /* 3. WYRÓWNANIE: dla elementów w niestandardowych listach. */
   .benefits-list li,
   .steps-list li {
-     @apply flex items-start;
+    display: flex;
+    align-items: flex-start;
+    line-height: var(--text-base--line-height);
   }
-
-  /* 4. STYLE NIESTANDARDOWE: definicje fajek i strzałek. */
   .benefits-list li::before {
     content: '✓';
-    @apply text-brand-blue mr-3 mt-1 font-bold;
+    color: var(--color-brand-blue);
+    font-weight: 700;
+    margin-right: var(--spacing-3);
+    margin-top: var(--spacing-1);
   }
-
   .steps-list li::before {
     content: '→';
-    @apply text-brand-blue mr-3;
+    color: var(--color-brand-blue);
+    margin-right: var(--spacing-3);
   }
 
   /* --- Elementy specjalne --- */
   .strapi-content .summary-box {
     font-size: var(--text-sm);
-    background-color: color-mix(in srgb, var(--color-brand-blue) 10%, transparent);
+    background-color: color-mix(in srgb, var(--color-brand-blue) 10%, transparent) !important; /* !important, aby nadpisać reset */
     padding: var(--spacing-4);
     border-radius: var(--radius-lg);
     margin-top: var(--spacing-6);

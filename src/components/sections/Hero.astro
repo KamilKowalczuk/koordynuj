@@ -1,7 +1,8 @@
 ---
-// src/components/sections/Hero.astro - WERSJA Z NOWĄ ARCHITEKTURĄ POZYCJONOWANIA
+// src/components/sections/Hero.astro - WERSJA Z IDEALNĄ WYSOKOŚCIĄ 100% VIEWPORT
 import InteractiveSphere from '../ui/InteractiveSphere.svelte';
 import { getHeroSection } from '../../lib/strapi';
+import { fixOrphans } from '../../lib/typography';
 
 const heroData = await getHeroSection();
 
@@ -16,7 +17,9 @@ const fallbackData = {
 const hero = heroData || fallbackData;
 
 const processDescription = (desc: string) => {
-    return desc.replace(/\*\*(.*?)\*\*/g, '<span class="block font-semibold text-text-primary mt-1">$1</span>');
+    let processed = desc.replace(/\*\*(.*?)\*\*/g, '<span class="block font-semibold text-text-primary mt-1">$1</span>');
+    // Stosujemy naszą funkcję na samym końcu
+    return fixOrphans(processed);
 };
 ---
 
@@ -26,7 +29,8 @@ const processDescription = (desc: string) => {
 >
   <div
     class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8
-           flex items-center py-20 sm:py-24 lg:py-32"
+           flex items-center"
+    style=`min-height: calc(100svh - var(--header-h, 180px))`
   >
     <div
       class="relative z-10 w-full lg:w-7/12
@@ -49,7 +53,7 @@ const processDescription = (desc: string) => {
       </div>
     </div>
 
-       <div
+    <div
       class="absolute z-0
              top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
              lg:left-auto lg:right-0 lg:translate-x-[8%]

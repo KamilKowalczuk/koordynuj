@@ -309,22 +309,38 @@
     line-height: inherit !important;
     white-space: normal !important;
   }
-  /* --- 4. System kontekstowy dla list (bez zmian, jest idealny) --- */
+   .strapi-content ul {
+    list-style-type: disc;
+    padding-left: var(--spacing-5); /* Używamy tokenu dla spójności */
+    margin-top: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+  .strapi-content ul li {
+    padding-left: var(--spacing-2);
+  }
+
+  /* 2. RESET: Stosowany TYLKO do list w specjalnych kontenerach. */
+  /* Ta reguła nadpisuje styl domyślny, usuwając kropki i wcięcie, aby przygotować miejsce na nasze ikony. */
   .benefits-list ul,
   .steps-list ul {
     list-style: none;
     padding-left: 0;
     margin-top: var(--spacing-2);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-2);
   }
+  
+  /* 3. WYRÓWNANIE: Stosowane TYLKO do elementów w naszych niestandardowych listach. */
   .benefits-list li,
   .steps-list li {
     display: flex;
     align-items: flex-start;
+    padding-left: 0; /* Resetujemy padding, bo mamy margines od ikony */
     line-height: var(--text-base--line-height);
   }
+
+  /* 4. IKONY NIESTANDARDOWE: Definicje "fajek" i "strzałek" (bez zmian). */
   .benefits-list li::before {
     content: '✓';
     color: var(--color-brand-blue);
@@ -332,11 +348,13 @@
     margin-right: var(--spacing-3);
     margin-top: var(--spacing-1);
   }
+
   .steps-list li::before {
     content: '→';
     color: var(--color-brand-blue);
     margin-right: var(--spacing-3);
   }
+
 
   /* --- Elementy specjalne --- */
   .strapi-content .summary-box {

@@ -1,22 +1,26 @@
 ---
-// src/components/layout/Footer.astro - WERSJA Z IDEALNYM WYRÓWNANIEM KOLUMN + LINKEDIN
+// src/components/layout/Footer.astro - WERSJA Z POPRAWNYM RENDEROWANIEM HTML
 import Logo from '../ui/Logo.astro';
+import { getGlobalSettings } from '../../lib/strapi';
 
-const settings = {
+const strapiSettings = await getGlobalSettings();
+
+const fallbackSettings = {
     contactPhone: "535 604 904",
     contactEmail: "kontakt@koordynujzdrowie.pl",
-    companyAddress: "ul. Zdrowa 1, 00-001 Warszawa"
+    companyAddress: "<p>Carewise Sp. z o.o.<br>Księdza Jerzego Popiełuszki 31 / 12,<br>20-052 Lublin, Polska</p>"
 };
+
+const settings = strapiSettings || fallbackSettings;
 
 const currentYear = new Date().getFullYear();
 ---
 <footer class="bg-background-muted border-t border-slate-200/60">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
     
-    <!-- ZMIANA: gap-x-12 dla równych odstępów poziomych -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-y-8 lg:gap-x-12 lg:items-start">
 
-      <div class="flex flex-col items-center lg:items-start lg:flex-shrink-0 lg:col-span-4 text-center lg:text-left" style="line-height: 0px;font-size: 0px;">
+      <div class="flex flex-col items-center lg:items-start lg:flex-shrink-0 lg:col-span-4 text-center lg:text-left">
         <a href="/" class="inline-block">
           <Logo isHomepage={false} />
         </a>
@@ -24,10 +28,9 @@ const currentYear = new Date().getFullYear();
           Podnosimy efektywność placówek medycznych, domykamy rozliczenia i dbamy o zgodność prawną. Uwalniamy Cię od chaosu.
         </p>
         
-        <!-- NOWE: Social Media Links -->
         <div class="mt-6 flex items-center gap-4 justify-center lg:justify-start">
           <a 
-            href="https://www.linkedin.com/company/koordynuj-zdrowie/about/?viewAsMember=true" 
+            href="https://www.linkedin.com/company/koordynuj-zdrowie/" 
             target="_blank" 
             rel="noopener noreferrer"
             class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200/60 text-text-muted hover:text-brand-blue hover:border-brand-blue/30 transition-all duration-200 hover:shadow-md"
@@ -74,10 +77,12 @@ const currentYear = new Date().getFullYear();
             </a>
           )}
           {settings.companyAddress && (
-            <p class="flex items-center justify-center lg:justify-start gap-3 text-text-muted">
-              <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-              <span>{settings.companyAddress}</span>
-            </p>
+            <div class="flex items-start justify-center lg:justify-start gap-3 text-text-muted">
+              <svg class="w-5 h-5 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              {/* === KLUCZOWA ZMIANA TUTAJ === */}
+              {/* Używamy dyrektywy `set:html` do renderowania HTML */}
+              <div set:html={settings.companyAddress} />
+            </div>
           )}
         </address>
       </div>

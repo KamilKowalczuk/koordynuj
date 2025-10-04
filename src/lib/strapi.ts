@@ -1,4 +1,4 @@
-// src/lib/strapi.ts - WERSJA Z "PANCERNĄ NORMALIZACJĄ" DANYCH
+// src/lib/strapi.ts - WERSJA Z POPRAWIONYM ADRESEM API DLA GLOBAL SETTINGS
 
 import type { IconKey, Service } from '../types';
 
@@ -43,11 +43,16 @@ export function getStrapiMediaUrl(media: { url: string } | null | undefined): st
 }
 
 // Reszta funkcji API bez zmian
-export async function getGlobalSettings(): Promise<GlobalSettings | null> { const response = await fetchStrapi('global-settings?populate=*'); return response?.data || null; }
+// === KLUCZOWA POPRAWKA TUTAJ ===
+export async function getGlobalSettings(): Promise<GlobalSettings | null> { 
+  const response = await fetchStrapi('global-setting?populate=*'); // ZMIANA: 'global-settings' -> 'global-setting'
+  return response?.data || null; 
+}
+// ===============================
+
 export async function getHeroSection(): Promise<HeroSection | null> { const response = await fetchStrapi('hero-section'); return response?.data || null; }
 export async function getProblems(): Promise<Problem[]> { const response = await fetchStrapi('problems?sort=order:asc'); return response?.data || []; }
 
-// === OSTATECZNA, KULOODPORNA WERSJA getServices ===
 export async function getServices(): Promise<Service[]> {
     const response = await fetchStrapi('services?sort=order:asc&filters[isActive][$eq]=true');
     const services = response?.data || [];
@@ -62,14 +67,12 @@ export async function getServices(): Promise<Service[]> {
         };
     });
 }
-// ===================================================
 
 export async function getProcessSteps(): Promise<ProcessStep[]> { const response = await fetchStrapi('process-steps?sort=order:asc'); return response?.data || []; }
 export async function getCaseStudy(): Promise<CaseStudy | null> { const response = await fetchStrapi('case-study'); return response?.data || null; }
 export async function getContactForm(): Promise<ContactForm | null> { const response = await fetchStrapi('contact-form'); return response?.data || null; }
 
 // Funkcje bloga (bez zmian)
-// ...
 export async function getBlogPosts(limit?: number, page: number = 1): Promise<BlogPost[] | null> {
     try {
       let query = `blog-posts?sort=published:desc&populate[blog_categories][populate]=*&populate[featuredImage][populate]=*`;
@@ -81,9 +84,9 @@ export async function getBlogPosts(limit?: number, page: number = 1): Promise<Bl
       console.error('Error fetching blog posts:', error);
       return null;
     }
-  }
+}
   
-  export async function getBlogPost(slug: string): Promise<BlogPost | null> {
+export async function getBlogPost(slug: string): Promise<BlogPost | null> {
     try {
       const query = `blog-posts?filters[slug][$eq]=${slug}&populate=*`;
       const response = await fetchStrapi(query);
@@ -92,9 +95,9 @@ export async function getBlogPosts(limit?: number, page: number = 1): Promise<Bl
       console.error('Error fetching blog post:', error);
       return null;
     }
-  }
+}
   
-  export async function getBlogCategories(): Promise<BlogCategory[] | null> {
+export async function getBlogCategories(): Promise<BlogCategory[] | null> {
     try {
       const response = await fetchStrapi('blog-categories');
       if (!response?.data) { return null; }
@@ -111,9 +114,9 @@ export async function getBlogPosts(limit?: number, page: number = 1): Promise<Bl
       console.error('Error fetching blog categories:', error);
       return null;
     }
-  }
+}
   
-  export async function getRelatedBlogPosts(currentSlug: string, categoryId?: number, limit: number = 3): Promise<BlogPost[] | null> {
+export async function getRelatedBlogPosts(currentSlug: string, categoryId?: number, limit: number = 3): Promise<BlogPost[] | null> {
     try {
       let query = `blog-posts?sort=published:desc&populate=*&pagination[limit]=${limit}&filters[$and][0][slug][$ne]=${currentSlug}`;
       if (categoryId) {
@@ -125,4 +128,4 @@ export async function getBlogPosts(limit?: number, page: number = 1): Promise<Bl
       console.error('Error fetching related blog posts:', error);
       return null;
     }
-  }
+}

@@ -1,52 +1,58 @@
 ---
-// src/components/sections/Process.astro - FINAL, COMPLETE VERSION
+// src/components/sections/Process.astro - WERSJA Z POPRAWIONYMI DANYMI ZAPASOWYMI
 import AnimateOnScroll from '../ui/AnimateOnScroll.astro';
 import InteractiveTimeline from '../ui/InteractiveTimeline.svelte';
+import { getProcessSteps } from '../../lib/strapi';
 
-const steps = [
-    { 
-        id: 1,
-        title: "Audyt i Strategia", 
-        description: "Analizujemy Twoją placówkę, identyfikujemy potencjał i tworzymy dedykowany plan działania.",
-        details: [
-            "Kompleksowa analiza obecnego stanu placówki",
-            "Identyfikacja obszarów z największym potencjałem wzrostu",
-            "Ocena zgodności z aktualnymi wymogami prawnymi",
-            "Opracowanie dedykowanej strategii rozwoju",
-            "Prezentacja rekomendacji i harmonogramu wdrożenia"
-        ],
-        duration: "2-3 tygodnie",
-        icon: "audit"
-    },
-    { 
-        id: 2,
-        title: "Wdrożenie i Szkolenia", 
-        description: "Implementujemy narzędzia, procedury i szkolimy personel, aby zapewnić płynne przejęcie nowych obowiązków.",
-        details: [
-            "Wdrożenie nowych procedur i dokumentacji",
-            "Konfiguracja systemów i narzędzi",
-            "Kompleksowe szkolenia dla całego personelu",
-            "Testowanie i optymalizacja procesów",
-            "Wsparcie w pierwszych tygodniach działania"
-        ],
-        duration: "4-6 tygodni",
-        icon: "implementation"
-    },
-    { 
-        id: 3,
-        title: "Ciągłe Wsparcie i Rozwój", 
-        description: "Monitorujemy wyniki, optymalizujemy procesy i zapewniamy bieżące wsparcie prawne i organizacyjne.",
-        details: [
-            "Regularne monitorowanie kluczowych wskaźników",
-            "Ciągła optymalizacja procesów",
-            "Bieżące wsparcie prawne i merytoryczne",
-            "Aktualizacja procedur zgodnie ze zmianami prawa",
-            "Okresowe audyty i rekomendacje rozwoju"
-        ],
-        duration: "Ciągle",
-        icon: "support"
-    }
-];
+let steps = await getProcessSteps();
+
+// Przetwarzamy pole 'details' z JSON na tablicę
+if (steps && steps.length > 0) {
+    steps = steps.map(step => {
+        let parsedDetails = [];
+        if (step.details && typeof step.details === 'string') {
+            try {
+                parsedDetails = JSON.parse(step.details);
+            } catch (e) {
+                console.error(`Błąd parsowania pola 'details' dla kroku "${step.title}":`, e);
+            }
+        } else if (Array.isArray(step.details)) {
+            parsedDetails = step.details;
+        }
+        return { ...step, details: parsedDetails };
+    });
+} else {
+    // KROK 1: Dodajemy brakujące pole 'order' do danych zapasowych
+    steps = [
+        { 
+            id: 1,
+            title: "Audyt i Strategia", 
+            description: "<p>Analizujemy Twoją placówkę, identyfikujemy potencjał i tworzymy dedykowany plan działania.</p>",
+            details: ["Kompleksowa analiza...", "Identyfikacja obszarów...", "Opracowanie strategii..."],
+            duration: "2-3 tygodnie",
+            icon: "audit",
+            order: 1 // DODANE
+        },
+        { 
+            id: 2,
+            title: "Wdrożenie i Szkolenia", 
+            description: "<p>Implementujemy narzędzia, procedury i szkolimy personel, aby zapewnić płynne przejęcie nowych obowiązków.</p>",
+            details: ["Wdrożenie procedur...", "Szkolenia dla personelu...", "Wsparcie wdrożeniowe..."],
+            duration: "4-6 tygodni",
+            icon: "implementation",
+            order: 2 // DODANE
+        },
+        { 
+            id: 3,
+            title: "Ciągłe Wsparcie i Rozwój", 
+            description: "<p>Monitorujemy wyniki, optymalizujemy procesy i zapewniamy bieżące wsparcie prawne i organizacyjne.</p>",
+            details: ["Regularne monitorowanie...", "Ciągła optymalizacja...", "Bieżące wsparcie..."],
+            duration: "Ciągle",
+            icon: "support",
+            order: 3 // DODANE
+        }
+    ];
+}
 ---
 
 <section id="proces" class="py-20 sm:py-32 bg-background-light relative">
@@ -79,6 +85,7 @@ const steps = [
             </div>
 
             <div>
+                {/* Krok 5: Przekazujemy dynamicznie załadowane i przetworzone dane */}
                 <InteractiveTimeline {steps} client:load />
             </div>
 

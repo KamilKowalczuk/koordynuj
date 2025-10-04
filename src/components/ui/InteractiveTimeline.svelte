@@ -1,13 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { register } from 'swiper/element/bundle';
+    import DOMPurify from 'isomorphic-dompurify'; // Krok 1: Importujemy DOMPurify dla bezpieczeństwa
 
     export let steps: any[] = [];
     let swiperEl: any;
 
     onMount(() => {
         register();
-        // Pobieramy instancję Swipera, aby móc sterować nią z naszych przycisków
         const swiperContainer = document.querySelector('.enhanced-swiper');
         if (swiperContainer) {
             swiperEl = swiperContainer;
@@ -59,7 +59,11 @@
                     </div>
                     <div class="flex flex-col flex-grow">
                         <h3 class="text-2xl font-bold text-text-primary mb-4 group-hover:text-brand-blue/90 transition-colors duration-300">{step.title}</h3>
-                        <p class="text-text-muted mb-4 leading-relaxed group-hover:text-text-primary/90 transition-colors duration-300">{step.description}</p>
+                        
+                        <div class="strapi-content mb-4 group-hover:text-text-primary/90 transition-colors duration-300">
+                            {@html DOMPurify.sanitize(step.description || '')}
+                        </div>
+
                         <ul class="text-text-muted space-y-2 flex-grow">
                             {#each step.details as detail}
                                 <li class="flex items-start detail-item group-hover:text-text-primary/90 transition-colors duration-300">

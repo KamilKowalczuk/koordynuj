@@ -1,7 +1,20 @@
 ---
-// src/components/sections/Contact.astro - FINAL, UNIFIED VERSION
-import AnimateOnScroll from '../ui/AnimateOnScroll.astro'; // Importujemy nasz system animacji
+// src/components/sections/Contact.astro - WERSJA ZINTEGROWANA ZE STRAPI
+import AnimateOnScroll from '../ui/AnimateOnScroll.astro';
 import ContactForm from '../ui/ContactForm.svelte';
+import { getGlobalSettings } from '../../lib/strapi';
+
+// Krok 1: Pobieramy dane globalne ze Strapi
+const settings = await getGlobalSettings();
+
+// Krok 2: Definiujemy dane zapasowe
+const fallbackSettings = {
+    contactPhone: "+48 535 604 904",
+    contactEmail: "kontakt@koordynujzdrowie.pl",
+};
+
+// Używamy danych ze Strapi lub danych zapasowych
+const contactData = settings || fallbackSettings;
 ---
 
 <section id="kontakt" class="py-20 sm:py-32 bg-background-muted relative overflow-hidden">
@@ -38,18 +51,26 @@ import ContactForm from '../ui/ContactForm.svelte';
             <div class="text-center mt-16">
                 <p class="text-text-muted mb-6">Lub skontaktuj się z nami bezpośrednio:</p>
                 <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
-                    <a href="tel:+48535604904" class="contact-link flex items-center text-brand-blue hover:text-brand-blue/80 transition-all duration-300 group">
-                        <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                        </svg>
-                        +48 535 604 904
-                    </a>
-                    <a href="mailto:kontakt@koordynujzdrowie.pl" class="contact-link flex items-center text-brand-blue hover:text-brand-blue/80 transition-all duration-300 group">
-                        <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                        kontakt@koordynujzdrowie.pl
-                    </a>
+                    
+                    {/* KROK 3: Używamy dynamicznych danych dla telefonu */}
+                    {contactData.contactPhone && (
+                        <a href={`tel:${contactData.contactPhone.replace(/\s/g, '')}`} class="contact-link flex items-center text-brand-blue hover:text-brand-blue/80 transition-all duration-300 group">
+                            <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            {contactData.contactPhone}
+                        </a>
+                    )}
+
+                    {/* KROK 4: Używamy dynamicznych danych dla emaila */}
+                    {contactData.contactEmail && (
+                        <a href={`mailto:${contactData.contactEmail}`} class="contact-link flex items-center text-brand-blue hover:text-brand-blue/80 transition-all duration-300 group">
+                            <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            {contactData.contactEmail}
+                        </a>
+                    )}
                 </div>
             </div>
         </div>

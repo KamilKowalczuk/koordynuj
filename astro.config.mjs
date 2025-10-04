@@ -6,9 +6,13 @@ import tailwindcss from '@tailwindcss/vite';
 
 import svelte from '@astrojs/svelte';
 
+import netlify from '@astrojs/netlify';
+
 
 // https://astro.build/config
 export default defineConfig({
+  output: 'server',
+  adapter: netlify(),
   vite: {
     plugins: [tailwindcss()]
   },

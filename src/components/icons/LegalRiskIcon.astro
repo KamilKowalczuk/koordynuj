@@ -1,0 +1,43 @@
+---
+// src/components/icons/LegalRiskIcon.astro
+interface Props {
+  className?: string;
+  decorative?: boolean;
+  title?: string;
+  strokeWidth?: number;
+  [key: string]: any; // dodatkowe atrybuty (id, data-*, itp.)
+}
+
+const {
+  className = "",
+  decorative = true,
+  title = "Ryzyko prawne",
+  strokeWidth = 1.5,
+  ...rest
+} = Astro.props as Props;
+
+const base =
+  "h-8 w-8 text-brand-blue mb-4 shrink-0 transition-transform duration-300 group-hover:scale-110";
+const mergedClass = [base, className, (Astro.props as any).class].filter(Boolean).join(" ");
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role="img"
+  aria-hidden={decorative ? "true" : "false"}
+  aria-label={decorative ? undefined : title}
+  class={mergedClass}
+  {...rest}
+>
+  { !decorative && <title set:text={title} /> }
+  <!-- Trójkąt ostrzegawczy + znak zapytania/punkt — „legal risk” -->
+  <path d="M12 9v3.75" />
+  <path d="M2.697 16.126c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+  <path d="M12 15.75h.007v.008H12v-.008z" />
+</svg>

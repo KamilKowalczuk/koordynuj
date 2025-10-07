@@ -1,0 +1,51 @@
+---
+// src/components/icons/RevenueLossIcon.astro
+interface Props {
+  className?: string;
+  decorative?: boolean;
+  title?: string;
+  strokeWidth?: number;
+  [key: string]: any;
+}
+
+const {
+  className = "",
+  decorative = true,
+  title = "Utrata przychodów",
+  strokeWidth = 1.5,
+  ...rest
+} = Astro.props as Props;
+
+const base =
+  "h-8 w-8 text-brand-blue mb-4 shrink-0 transition-transform duration-300 group-hover:scale-110";
+const mergedClass = [base, className, (Astro.props as any).class].filter(Boolean).join(" ");
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role="img"
+  aria-hidden={decorative ? "true" : "false"}
+  aria-label={decorative ? undefined : title}
+  class={mergedClass}
+  {...rest}
+>
+  { !decorative && <title set:text={title} /> }
+
+  <!-- Linia bazowa wykresu -->
+  <path d="M4 18h16" />
+
+  <!-- Malejące słupki -->
+  <path d="M7 18V10" />
+  <path d="M11 18V12.5" />
+  <path d="M15 18V15" />
+
+  <!-- Strzałka w dół (symbolizuje spadek) -->
+  <path d="M18 6v8" />
+  <path d="M16 12l2 2 2-2" />
+</svg>

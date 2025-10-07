@@ -1,0 +1,193 @@
+---
+// src/layouts/MainLayout.astro - PERFECT: Instant scroll restoration, no flash
+import '../styles/global.css';
+import ServicePanel from '../components/ui/ServicePanel.svelte';
+import Header from '../components/layout/Header.svelte';
+import Footer from '../components/layout/Footer.astro';
+import Logo from '../components/ui/Logo.astro';
+import CookieConsent from '../components/ui/CookieConsent.svelte';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+// Sprawdzamy, czy jesteśmy na stronie głównej
+const isHomepage = Astro.url.pathname === '/';
+const siteTitle = title || "Koordynuj Zdrowie";
+const siteDescription = description || "Zarządzanie medycyną. Zredukowane do perfekcji.";
+const themeColor = "#00A9E0";
+---
+
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content={siteDescription} />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{siteTitle}</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  
+  <meta property="og:title" content={siteTitle} />
+  <meta property="og:description" content={siteDescription} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={siteTitle} />
+  <meta name="twitter:description" content={siteDescription} />
+  <meta name="theme-color" content={themeColor} />
+
+  <!-- CRITICAL: Inline script - wykonuje się NATYCHMIAST, zanim strona się wyrenderuje -->
+  <script is:inline>
+    // Wyłączamy automatyczne scroll restoration
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // Funkcja wykrywania typu nawigacji
+    function getNavigationType() {
+      const navEntry = performance.getEntriesByType('navigation')[0];
+      if (navEntry) return navEntry.type;
+      const perfNav = performance.navigation;
+      if (perfNav.type === 0) return 'navigate';
+      if (perfNav.type === 1) return 'reload';
+      if (perfNav.type === 2) return 'back_forward';
+      return 'navigate';
+    }
+
+    // NATYCHMIASTOWA akcja - PRZED renderowaniem
+    (function() {
+      const navType = getNavigationType();
+      const hasHash = window.location.hash;
+      
+      if (navType === 'reload') {
+        // RELOAD: Scrolluj na górę natychmiast
+        if (hasHash) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+        window.scrollTo(0, 0);
+        console.log('🔄 Reload → instant scroll to top');
+        
+      } else if (navType === 'back_forward') {
+        // BACK/FORWARD: Przywróć pozycję NATYCHMIAST z history.state
+        const savedScroll = history.state?.scrollY;
+        if (savedScroll !== undefined) {
+          // Scrollujemy NATYCHMIAST, bez czekania na load
+          window.scrollTo(0, savedScroll);
+          console.log(`⬅️ Back/Forward → instant restore to ${savedScroll}`);
+        } else {
+          // Fallback na sessionStorage (dla compatibility)
+          const fallbackScroll = sessionStorage.getItem('scroll_' + window.location.pathname);
+          if (fallbackScroll) {
+            window.scrollTo(0, parseInt(fallbackScroll));
+            console.log(`⬅️ Back/Forward → fallback restore to ${fallbackScroll}`);
+          }
+        }
+      }
+      // Dla 'navigate' nic nie robimy - zostanie na górze lub scrolluje do hash później
+    })();
+  </script>
+</head>
+<body class="bg-background-light text-text-primary font-sans antialiased">
+  <Header client:load>
+    <div slot="logo">
+      <a href="/" class="flex-shrink-0">
+        <Logo isHomepage={isHomepage} />
+      </a>
+    </div>
+  </Header>
+  
+  <main id="top">
+    <slot />
+      <CookieConsent client:load />
+
+  </main>
+  
+  <Footer />
+  <ServicePanel client:load />
+
+  <script>
+    // === ZAPISYWANIE POZYCJI PRZED NAWIGACJĄ ===
+    
+    // Zapisujemy w history.state (najszybszy dostęp)
+    let scrollSaveTimeout: ReturnType<typeof setTimeout>;
+    
+    function saveScrollPosition() {
+      clearTimeout(scrollSaveTimeout);
+      scrollSaveTimeout = setTimeout(() => {
+        const currentScroll = window.scrollY;
+        const currentPath = window.location.pathname;
+        
+        // Zapisz w history.state (primary)
+        history.replaceState(
+          { ...history.state, scrollY: currentScroll }, 
+          ''
+        );
+        
+        // Zapisz również w sessionStorage (fallback)
+        sessionStorage.setItem(`scroll_${currentPath}`, currentScroll.toString());
+        
+        console.log(`💾 Saved scroll: ${currentScroll} for ${currentPath}`);
+      }, 100); // Debounce
+    }
+
+    // Zapisz pozycję przy scrollowaniu (debounced)
+    window.addEventListener('scroll', saveScrollPosition, { passive: true });
+    
+    // Zapisz pozycję przed nawigacją
+    window.addEventListener('beforeunload', saveScrollPosition);
+
+    // === OBSŁUGA ANCHOR LINKS (smooth scrolling) ===
+    document.addEventListener('DOMContentLoaded', () => {
+      const anchorLinks = document.querySelectorAll('a[href^="#"]');
+      
+      anchorLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          const href = link.getAttribute('href');
+          
+          if (href === '#') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
+
+          const targetId = href?.substring(1);
+          const targetElement = document.getElementById(targetId || '');
+          
+          if (targetElement) {
+            e.preventDefault();
+            
+            // Smooth scroll to target
+            targetElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+            
+            // Update URL with hash (tylko na stronie głównej)
+            if (window.location.pathname === '/') {
+              history.replaceState({ ...history.state }, '', href);
+            }
+          }
+        });
+      });
+
+      // === OBSŁUGA DEEP LINKS (hash w URL przy pierwszym załadowaniu) ===
+      const navType = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navType?.type === 'navigate' && window.location.hash) {
+        const targetElement = document.getElementById(window.location.hash.substring(1));
+        if (targetElement) {
+          setTimeout(() => {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "tasty-telescope",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^6.5.11",
+    "@astrojs/svelte": "^7.1.1",
+    "@tailwindcss/vite": "^4.1.13",
+    "astro": "^5.13.7",
+    "isomorphic-dompurify": "^2.28.0",
+    "resend": "^6.1.2",
+    "svelte": "^5.38.10",
+    "swiper": "^12.0.2",
+    "tailwindcss": "^4.1.13",
+    "three": "^0.180.0",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0"
+  }
+}

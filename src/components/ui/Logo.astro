@@ -1,0 +1,39 @@
+---
+// src/components/ui/Logo.astro
+import { Image } from 'astro:assets';
+import logoSvg from '../../assets/logo.svg';
+
+interface Props {
+    className?: string;
+    isHomepage?: boolean; // Nowa właściwość
+}
+
+const { className, isHomepage = false } = Astro.props;
+---
+<div class:list={["logo-container", className]}>
+    <a href="/" aria-label="Strona główna Koordynuj Zdrowie">
+        <Image 
+            src={logoSvg} 
+            alt="Koordynuj Zdrowie Logo" 
+            class="h-auto" 
+            widths={[150, 200]}
+            sizes="(max-width: 1024px) 150px, 200px"
+        />
+    </a>
+</div>
+
+<style define:vars={{
+    initialWidth: isHomepage ? '230px' : '150px',
+    scrolledWidth: '150px'
+}}>
+    .logo-container :global(img) {
+        /* Używamy zmiennych CSS do dynamicznego ustawienia rozmiaru */
+        width: var(--initialWidth);
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Zmniejszamy logo po przewinięciu, ale tylko na stronie głównej */
+    :global(header[data-scrolled="true"]) .logo-container :global(img) {
+        width: var(--scrolledWidth);
+    }
+</style>

@@ -1,0 +1,91 @@
+---
+// src/components/sections/Services.astro - WERSJA W PEŁNI ZINTEGROWANA ZE STRAPI
+import ServicesGrid from '../ui/ServicesGrid.svelte';
+import AnimateOnScroll from '../ui/AnimateOnScroll.astro';
+import { getServices } from '../../lib/strapi'; // Krok 1: Importujemy funkcję API
+import type { Service } from '../../types'; // Krok 2: Importujemy nasz zaktualizowany typ
+
+// Krok 3: Usuwamy całą hardkodowaną tablicę 'services'
+// Krok 4: Pobieramy dane dynamicznie z CMS przy każdym budowaniu strony
+const services: Service[] = await getServices();
+---
+
+<section id="oferta" class="py-20 sm:py-32 bg-background-light relative overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
+        <div class="services-bg-pattern absolute inset-0"></div>
+    </div>
+    <div class="absolute inset-0 opacity-5">
+        <svg class="w-full h-full" viewBox="0 0 1200 800">
+            <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00A9E0" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+    </div>
+
+    <AnimateOnScroll>
+        <div class="relative z-10 max-w-6xl mx-auto px-4">
+            {/* Statyczna treść nagłówkowa pozostaje bez zmian */}
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
+                    Nasze 4 filary to Twoja droga do porządku.
+                </h2>
+                <p class="text-lg text-text-muted max-w-3xl mx-auto">
+                    Kompleksowe rozwiązania, które przekształcą Twoją placówkę w nowoczesną, efektywną i prawnie bezpieczną organizację.
+                </p>
+            </div>
+
+            <div>
+                {/* Krok 5: Przekazujemy dynamicznie pobrane dane do komponentu Svelte. Ten kod działa bez zmian. */}
+                <ServicesGrid {services} client:load />
+            </div>
+
+            <div class="text-center mt-16">
+                <p class="text-lg text-text-muted mb-6">
+                    Gotowy na <span class="font-semibold text-brand-blue">transformację</span> swojej placówki?
+                </p>
+                <a href="#kontakt" class="btn-primary inline-flex items-center group">
+                    Umów bezpłatną konsultację
+                    <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </AnimateOnScroll>
+</section>
+
+{/* Sekcja <style> pozostaje bez zmian */}
+<style>
+  .services-bg-pattern {
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0, 169, 224, 0.15) 1px, transparent 1px),
+      radial-gradient(circle at 80% 70%, rgba(0, 169, 224, 0.1) 1px, transparent 1px),
+      radial-gradient(circle at 40% 60%, rgba(0, 169, 224, 0.12) 1px, transparent 1px);
+    background-size: 180px 180px, 250px 250px, 220px 220px;
+    animation: patternDrift 25s linear infinite;
+  }
+
+  .btn-primary {
+    position: relative;
+    overflow: hidden;
+  }
+
+  @keyframes patternDrift {
+    0% { background-position: 0% 0%, 0% 0%, 0% 0%; }
+    100% { background-position: 100% 100%, -100% 100%, 50% -100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .services-bg-pattern {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .services-bg-pattern { display: none; }
+  }
+</style>

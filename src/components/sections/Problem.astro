@@ -1,0 +1,151 @@
+---
+// src/components/sections/Problems.astro - REFACTORED WITH UNIFIED ANIMATION
+import AnimateOnScroll from '../ui/AnimateOnScroll.astro'; // Nasz nowy komponent
+import RevenueLossIcon from '../icons/RevenueLossIcon.astro';
+import LegalRiskIcon from '../icons/LegalRiskIcon.astro';
+import InefficiencyIcon from '../icons/InefficiencyIcon.astro';
+import { getProblems } from '../../lib/strapi';
+import DOMPurify from 'isomorphic-dompurify';
+
+const problemsData = await getProblems();
+
+const iconMap = {
+  'revenue-loss': RevenueLossIcon,
+  'legal-risk': LegalRiskIcon,
+  'inefficiency': InefficiencyIcon
+};
+
+const fallbackProblems = [
+  { title: "Utracone Przychody", description: "Środki finansowe umykają przez brak właściwej weryfikacji raportów i poprawy błędów.", icon: "revenue-loss" },
+  { title: "Ryzyko Prawne", description: "Niezgodność z wymogami NFZ czy UODO to ryzyko wysokich, dotkliwych kar finansowych.", icon: "legal-risk" },
+  { title: "Nieefektywne Procesy", description: "Niezoptymalizowane procedury administracyjne to gwarancja wypalenia personelu.", icon: "inefficiency" }
+];
+
+const strapiProblems = problemsData && problemsData.length > 0 ? problemsData : fallbackProblems;
+
+const asHtml = (html: string) => DOMPurify.sanitize(html ?? "", { USE_PROFILES: { html: true } });
+
+const problems = strapiProblems.map((problem: any) => {
+  const title = problem?.attributes?.title ?? problem?.title ?? "";
+  const description = problem?.attributes?.description ?? problem?.description ?? "";
+  const iconKey = problem?.attributes?.icon ?? problem?.icon ?? "revenue-loss";
+  return {
+    title,
+    description,
+    Icon: iconMap[iconKey as keyof typeof iconMap] || RevenueLossIcon
+  };
+});
+---
+
+<section id="problemy" class="py-20 sm:py-32 bg-white relative overflow-hidden">
+  <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
+    <div class="problems-bg-pattern absolute inset-0"></div>
+  </div>
+
+  {/* Cała zawartość sekcji opakowana w nasz nowy komponent animacji */}
+  <AnimateOnScroll>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* Usunęliśmy atrybuty 'data-reveal' z nagłówka */}
+      <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tighter">
+          Chaos ma swoją cenę - </br>Płacisz za nią codziennie.
+        </h2>
+        <p class="text-lg text-text-muted mb-16 md:mb-24">
+          Identyfikujemy trzy fundamentalne filary ryzyka, które po cichu erodują rentowność i bezpieczeństwo każdej placówki medycznej.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-8">
+        {problems.map((problem, index) => (
+          // Usunęliśmy atrybuty 'data-reveal' z kart
+          <div 
+            class="problem-card card group flex flex-col p-8 bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10"
+            data-problem-index={index}
+          >
+            <div class="mb-1 icon-container relative">
+              <div class="icon-glow absolute inset-0 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+              <problem.Icon className="h-10 w-10 text-brand-blue group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 relative z-10 icon-element" />
+            </div>
+            
+            <div class="flex flex-col flex-grow">
+              <h3 class="text-2xl font-bold text-text-primary mb-4 group-hover:text-brand-blue/90 transition-colors duration-300">
+                {problem.title}
+              </h3>
+              <div
+                class="text-text-muted leading-relaxed group-hover:text-text-primary/90 transition-colors duration-300"
+                set:html={asHtml(problem.description)}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </AnimateOnScroll>
+</section>
+
+<style>
+  /* === USUNIĘTO WSZYSTKIE STYLE ZWIĄZANE Z 'data-reveal' === */
+  
+  /* Pozostawione style interakcji i tła - bez zmian */
+  .problem-card {
+    cursor: default;
+    position: relative;
+  }
+  
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    background: linear-gradient(135deg, rgba(0, 169, 224, 0.05), rgba(0, 169, 224, 0.02));
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  
+  .problem-card:hover::before {
+    opacity: 1;
+  }
+
+  .icon-glow {
+    background: radial-gradient(circle, rgba(0, 169, 224, 0.3) 0%, transparent 70%);
+    width: 60px;
+    height: 60px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .problems-bg-pattern {
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(0, 169, 224, 0.3) 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, rgba(0, 169, 224, 0.2) 1px, transparent 1px);
+    background-size: 100px 100px, 150px 150px;
+    animation: patternDrift 30s linear infinite;
+  }
+
+  .problem-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .problem-card:hover .icon-element {
+    filter: drop-shadow(0 4px 8px rgba(0, 169, 224, 0.2));
+  }
+
+  @keyframes patternDrift {
+    0% { background-position: 0% 0%, 0% 0%; }
+    100% { background-position: 100% 100%, -100% 100%; }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .problem-card,
+    .icon-element,
+    .problems-bg-pattern {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .problems-bg-pattern { display: none; }
+  }
+</style>

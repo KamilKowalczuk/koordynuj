@@ -1,0 +1,81 @@
+---
+// src/components/sections/Hero.astro - WERSJA Z IDEALNĄ WYSOKOŚCIĄ 100% VIEWPORT
+import InteractiveSphere from '../ui/InteractiveSphere.svelte';
+import { getHeroSection } from '../../lib/strapi';
+import { fixOrphans } from '../../lib/typography';
+
+const heroData = await getHeroSection();
+
+const fallbackData = {
+    mainTitle: "Zarządzanie medycyną.",
+    subTitle: "Zredukowane do perfekcji.",
+    description: "Podnosimy efektywność placówki, domykamy rozliczenia i dbamy o zgodność prawną. **Uwalniamy Cię od chaosu.**",
+    ctaButtonText: "Odkryj Klarowność",
+    ctaButtonLink: "#kontakt"
+};
+
+const hero = heroData || fallbackData;
+
+const processDescription = (desc: string) => {
+    let processed = desc.replace(/\*\*(.*?)\*\*/g, '<span class="block font-semibold text-text-primary mt-1">$1</span>');
+    // Stosujemy naszą funkcję na samym końcu
+    return fixOrphans(processed);
+};
+---
+
+<section
+  class="relative bg-background-light overflow-hidden"
+  style=`padding-top: var(--header-h, 180px)`
+>
+  <div
+    class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8
+           flex items-center"
+    style=`min-height: calc(100svh - var(--header-h, 180px))`
+  >
+    <div
+      class="relative z-10 w-full lg:w-7/12
+             text-center lg:text-left"
+    >
+      <div class="hero-content">
+        <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-text-primary leading-tight tracking-tighter hero-element" style="--delay: 400ms;">
+          <span class="block">{hero.mainTitle}</span>
+          <span class="block text-brand-blue mt-2">{hero.subTitle}</span>
+        </h1>
+        <h2 class="mt-8 text-xl text-text-muted hero-element" style="--delay: 600ms;">
+          <span set:html={processDescription(hero.description)}></span>
+        </h2>
+        <div class="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 hero-element" style="--delay: 800ms;">
+          <a href={hero.ctaButtonLink} class="btn-primary w-full sm:w-auto text-lg px-10 py-4 group">
+            {hero.ctaButtonText}
+            <svg class="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="absolute z-0
+             top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+             lg:left-auto lg:right-0 lg:translate-x-[8%]
+             w-[clamp(400px,95vw,620px)] lg:w-[720px]
+             h-auto pointer-events-none"
+    >
+      <div class="aspect-square opacity-100">
+        <InteractiveSphere client:load />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+    /* Style animacji bez zmian */
+    .hero-content { opacity: 1; transform: translateY(0); }
+    .hero-element {
+        opacity: 0.95;
+        transform: translateY(10px);
+        animation: hero-enhance 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation-delay: var(--delay, 0s);
+    }
+    @keyframes hero-enhance { to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { .hero-element { opacity: 1; transform: none; animation: none; } }
+</style>

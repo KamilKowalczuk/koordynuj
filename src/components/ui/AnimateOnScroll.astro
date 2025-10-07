@@ -1,0 +1,54 @@
+---
+// src/components/ui/AnimateOnScroll.astro
+interface Props {
+	className?: string;
+	threshold?: number; // Jak duża część elementu musi być widoczna (0.0 to 1.0)
+}
+
+const { className, threshold = 0.1 } = Astro.props;
+---
+
+<div 
+	class:list={["animate-on-scroll", className]}
+	data-threshold={threshold}
+>
+	<slot />
+</div>
+
+<script>
+	const observers = new Map();
+
+	// Funkcja, która dodaje klasę 'is-visible' gdy element wchodzi w viewport
+	const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				entry.target.classList.add('is-visible');
+				
+				// Opcjonalnie: przestań obserwować po jednorazowym uruchomieniu animacji
+				const observer = observers.get(entry.target);
+				if (observer) {
+					observer.unobserve(entry.target);
+					observers.delete(entry.target);
+				}
+			}
+		});
+	};
+
+	// Inicjalizacja obserwatora dla wszystkich elementów z klasą 'animate-on-scroll'
+	document.addEventListener('DOMContentLoaded', () => {
+		const elements = document.querySelectorAll('.animate-on-scroll');
+		
+		elements.forEach(el => {
+			const threshold = parseFloat(el.getAttribute('data-threshold') || '0.1');
+			
+			const observer = new IntersectionObserver(handleIntersection, {
+				root: null, // viewport
+				rootMargin: '0px',
+				threshold: threshold,
+			});
+			
+			observer.observe(el);
+			observers.set(el, observer);
+		});
+	});
+</script>

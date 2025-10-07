@@ -1,0 +1,283 @@
+---
+// src/pages/blog/[slug].astro - POJEDYNCZY ARTYKUŁ Z INTEGRACJĄ SEO
+import MainLayout from '../../layouts/MainLayout.astro';
+import SEOHead from '../../components/seo/SEOHead.astro';
+import AnimateOnScroll from '../../components/ui/AnimateOnScroll.astro';
+import Header from '../../components/layout/Header.svelte';
+import Footer from '../../components/layout/Footer.astro';
+import ServicePanel from '../../components/ui/ServicePanel.svelte';
+import Logo from '../../components/ui/Logo.astro';
+import { getBlogPosts, getBlogPost, getRelatedBlogPosts, getStrapiMediaUrl } from '../../lib/strapi';
+import type { BlogPost } from '../../lib/strapi';
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts();
+  if (!posts) return [];
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { slug } = Astro.params;
+
+if (!post) {
+  return new Response(null, { 
+    status: 500, 
+    statusText: `Could not find post data for slug: ${slug}`
+  });
+}
+
+const category = post.blog_categories?.[0];
+const relatedPosts: BlogPost[] | null = await getRelatedBlogPosts(slug, category?.id);
+const imageUrl = getStrapiMediaUrl(post.featuredImage) ?? undefined;
+
+// Fallback SEO data jeśli nie ma w Strapi
+const fallbackTitle = `${post.title} | Koordynuj Zdrowie`;
+const fallbackDescription = post.excerpt || "Blog o medycynie i zarządzaniu placówkami medycznymi.";
+
+const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('pl-PL', { 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric' 
+});
+
+const createExcerpt = (content: string, length: number = 100) => {
+    if (!content) return "";
+    const plainText = content.replace(/<[^>]*>/g, '');
+    return plainText.length > length ? plainText.substring(0, length) + '...' : plainText;
+};
+---
+
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="generator" content={Astro.generator} />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  
+  <!-- SEO Component - używa danych SEO z pola 'seo' artykułu -->
+  <SEOHead 
+    seo={post.seo}
+    fallbackTitle={fallbackTitle}
+    fallbackDescription={fallbackDescription}
+    fallbackImage={imageUrl}
+    type="article"
+  />
+</head>
+<body class="bg-background-light text-text-primary font-sans antialiased">
+  <style is:global>
+    @import '../../styles/global.css';
+  </style>
+
+  <Header client:load>
+    <div slot="logo">
+      <a href="/" class="flex-shrink-0">
+        <Logo isHomepage={false} />
+      </a>
+    </div>
+  </Header>
+  
+  <article>
+    <div class="pt-32 sm:pt-40 pb-12 sm:pb-16 bg-gradient-to-b from-background-muted to-background-light relative overflow-hidden">
+      <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
+        <div class="post-header-bg-pattern absolute inset-0"></div>
+      </div>
+      
+      <AnimateOnScroll>
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {category && (
+            <span class="inline-flex items-center px-3 py-1 mb-6 rounded-full text-sm font-medium bg-brand-blue/10 text-brand-blue">
+              {category.title}
+            </span>
+          )}
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-6 tracking-tight leading-tight">
+            {post.title}
+          </h1>
+          <div class="flex items-center justify-center gap-4 text-text-muted text-sm">
+            <time datetime={post.published}>{formatDate(post.published)}</time>
+          </div>
+        </div>
+      </AnimateOnScroll>
+    </div>
+
+    <div class="py-16 sm:py-20 bg-background-light">
+      <AnimateOnScroll>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {imageUrl && (
+            <div class="aspect-video rounded-3xl overflow-hidden shadow-2xl mb-12">
+              <img src={imageUrl} alt={post.title} class="w-full h-full object-cover" />
+            </div>
+          )}
+          
+          <div class="prose prose-lg prose-custom mx-auto">
+            {post.content ? (
+              <div set:html={post.content} />
+            ) : (
+              <p>Treść w przygotowaniu...</p>
+            )}
+          </div>
+          
+          <div class="mt-16 pt-8 border-t border-slate-200/80 text-center">
+            <a href="/blog" class="btn-primary inline-flex items-center group">
+              <svg class="mr-2 w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Wszystkie artykuły
+            </a>
+          </div>
+        </div>
+      </AnimateOnScroll>
+    </div>
+
+    {relatedPosts && relatedPosts.length > 0 && (
+      <section class="py-16 sm:py-24 bg-background-muted">
+        <AnimateOnScroll>
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-text-primary mb-4">Powiązane artykuły</h2>
+            </div>
+            <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
+              {relatedPosts.slice(0, 3).map((rp) => {
+                  const relatedImageUrl = getStrapiMediaUrl(rp.featuredImage);
+                  const relatedCategoryName = rp.blog_categories?.[0]?.title || "Artykuł";
+                  return (
+                      <a href={`/blog/${rp.slug}`} class="blog-card group flex flex-col bg-white border border-slate-200/80 rounded-3xl shadow-sm transition-all duration-500 hover:border-brand-blue/50 hover:shadow-xl hover:shadow-brand-blue/10">
+                          <div class="aspect-[16/9] bg-gradient-to-br from-brand-blue/10 to-brand-blue/5 rounded-t-3xl overflow-hidden relative">
+                              {relatedImageUrl ? (
+                                  <img src={relatedImageUrl} alt={rp.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                              ) : (
+                                  <div class="w-full h-full flex items-center justify-center">
+                                      <svg class="w-12 h-12 text-brand-blue/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                      </svg>
+                                  </div>
+                              )}
+                              <div class="absolute top-4 left-4">
+                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-brand-blue/90 text-white">{relatedCategoryName}</span>
+                              </div>
+                          </div>
+                          <div class="flex flex-col flex-grow p-6">
+                              <div class="text-sm text-text-muted mb-3">
+                                  <time>{formatDate(rp.published)}</time>
+                              </div>
+                              <h3 class="text-xl font-bold text-text-primary mb-3 group-hover:text-brand-blue/90 transition-colors duration-300 line-clamp-2">{rp.title}</h3>
+                              <p class="text-text-muted leading-relaxed mb-4 flex-grow line-clamp-3">{rp.excerpt || createExcerpt(rp.content || "")}</p>
+                              <span class="inline-flex items-center text-brand-blue font-semibold mt-auto group-hover:translate-x-1 transition-transform duration-300">
+                                  Czytaj więcej
+                                  <svg class="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                  </svg>
+                              </span>
+                          </div>
+                      </a>
+                  );
+              })}
+            </div>
+          </div>
+        </AnimateOnScroll>
+      </section>
+    )}
+  </article>
+  
+  <Footer />
+  <ServicePanel client:load />
+</body>
+</html>
+
+<!-- IMPORTS (dodaj na początku frontmatter):
+
+-->
+
+<style is:global>
+  .prose-custom {
+    color: var(--color-text-primary);
+    line-height: 1.75;
+  }
+  .prose-custom p {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+  }
+  .prose-custom h2, .prose-custom h3, .prose-custom h4 {
+    color: var(--color-text-primary);
+    font-weight: 700;
+    margin-top: 2.5em;
+    margin-bottom: 1.25em;
+  }
+  .prose-custom h2 {
+    font-size: 1.875rem;
+    border-bottom: 2px solid hsl(var(--color-brand-blue-hsl) / 0.1);
+    padding-bottom: 0.5rem;
+  }
+  .prose-custom h3 {
+    font-size: 1.5rem;
+    color: var(--color-brand-blue);
+  }
+  .prose-custom a {
+    color: var(--color-brand-blue);
+    font-weight: 500;
+    text-decoration: none;
+    background-image: linear-gradient(var(--color-brand-blue), var(--color-brand-blue));
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    transition: background-size 0.3s ease;
+  }
+  .prose-custom a:hover {
+    background-size: 100% 2px;
+  }
+  .prose-custom blockquote {
+    border-left: 3px solid var(--color-brand-blue);
+    padding: 1rem 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--color-text-muted);
+    background: var(--color-background-muted);
+    border-radius: 0.75rem;
+  }
+  .prose-custom ul, .prose-custom ol {
+    margin: 1.5rem 0;
+    padding-left: 1.75rem;
+  }
+  .prose-custom li {
+    margin-bottom: 0.75rem;
+  }
+  .prose-custom li::marker {
+    color: var(--color-brand-blue);
+    font-weight: 600;
+  }
+  .prose-custom img {
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+  .post-header-bg-pattern {
+    background-image: 
+      radial-gradient(circle at 30% 30%, rgba(0, 169, 224, 0.06) 1px, transparent 1px),
+      radial-gradient(circle at 70% 70%, rgba(0, 169, 224, 0.08) 1px, transparent 1px);
+    background-size: 120px 120px, 180px 180px;
+    animation: patternDrift 25s linear infinite;
+  }
+  @keyframes patternDrift {
+    0% { background-position: 0% 0%, 0% 0%; }
+    100% { background-position: 100% 100%, -100% 100%; }
+  }
+  .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+  .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .blog-card { position: relative; cursor: pointer; }
+    .blog-card::before {
+        content: ''; position: absolute; inset: 0; border-radius: 1.5rem;
+        background: linear-gradient(135deg, rgba(0, 169, 224, 0.05), rgba(0, 169, 224, 0.02));
+        opacity: 0; transition: opacity 0.5s ease;
+    }
+    .blog-card:hover::before { opacity: 1; }
+    .blog-card:hover { transform: translateY(-4px); }
+</style>

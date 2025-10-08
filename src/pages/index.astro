@@ -1,7 +1,8 @@
 ---
-// src/pages/index.astro - HOMEPAGE Z INTEGRACJĄ SEO
+// src/pages/index.astro
 import MainLayout from '../layouts/MainLayout.astro';
 import SEOHead from '../components/seo/SEOHead.astro';
+
 import Hero from '../components/sections/Hero.astro';
 import Problems from '../components/sections/Problem.astro';
 import Services from '../components/sections/Services.astro';
@@ -9,108 +10,31 @@ import CaseStudy from '../components/sections/CaseStudy.astro';
 import Process from '../components/sections/Process.astro';
 import BlogSection from '../components/sections/BlogSection.astro';
 import Contact from '../components/sections/Contact.astro';
-import Header from '../components/layout/Header.svelte';
-import Footer from '../components/layout/Footer.astro';
-import ServicePanel from '../components/ui/ServicePanel.svelte';
-import Logo from '../components/ui/Logo.astro';
+
 import { getSeoHome } from '../lib/strapi';
 
-// Pobierz dane SEO dla strony głównej
 const seoData = await getSeoHome();
 ---
 
-<!doctype html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="generator" content={Astro.generator} />
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  
-  <!-- SEO Component -->
-  <SEOHead 
+<MainLayout
+  title="Koordynuj Zdrowie - Zarządzanie medycyną. Zredukowane do perfekcji."
+  description="Podnosimy efektywność placówki, domykamy rozliczenia i dbamy o zgodność prawną. Uwalniamy Cię od chaosu."
+>
+  <!-- Wstrzykujemy meta/SEO bezpośrednio do <head> layoutu -->
+  <SEOHead
+    slot="head"
     seo={seoData}
     fallbackTitle="Koordynuj Zdrowie - Zarządzanie medycyną. Zredukowane do perfekcji."
     fallbackDescription="Podnosimy efektywność placówki, domykamy rozliczenia i dbamy o zgodność prawną. Uwalniamy Cię od chaosu."
     type="website"
   />
-</head>
-<body class="bg-background-light text-text-primary font-sans antialiased">
-  <!-- Importuj style globalnie -->
-  <style is:global>
-    @import '../styles/global.css';
-  </style>
 
-  <!-- Header -->
-  <Header client:load>
-    <div slot="logo">
-      <a href="/" class="flex-shrink-0">
-        <Logo isHomepage={true} />
-      </a>
-    </div>
-  </Header>
-  
-  <!-- Main Content -->
-  <main id="main-content">
-    <Hero />
-    <Problems />
-    <Services />
-    <CaseStudy />
-    <Process />
-    <BlogSection />
-    <Contact />
-  </main>
-  
-  <!-- Footer -->
-  <Footer />
-  <ServicePanel client:load />
-
-  <!-- Scripts -->
-  <script>
-    // Scroll restoration logic
-    document.addEventListener('DOMContentLoaded', () => {
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'auto';
-      }
-
-      window.addEventListener('beforeunload', () => {
-        sessionStorage.setItem('scrollPosition', window.scrollY.toString());
-      });
-
-      const anchorLinks = document.querySelectorAll('a[href^="#"]');
-      anchorLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          const href = link.getAttribute('href');
-          
-          if (href === '#') {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            return;
-          }
-
-          const targetId = href?.substring(1);
-          const targetElement = document.getElementById(targetId || '');
-          
-          if (targetElement) {
-            e.preventDefault();
-            targetElement.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
-            });
-            
-            if (window.location.pathname === '/') {
-              window.history.replaceState(null, '', href);
-            }
-          }
-        });
-      });
-    });
-  </script>
-</body>
-</html>
+  <!-- Treść strony -->
+  <Hero />
+  <Problems />
+  <Services />
+  <CaseStudy />
+  <Process />
+  <BlogSection />
+  <Contact />
+</MainLayout>

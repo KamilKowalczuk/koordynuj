@@ -7,7 +7,7 @@ import netlify from '@astrojs/netlify';
 // https://astro.build/config
 export default defineConfig({
   // KRYTYCZNE: Zdefiniuj URL produkcyjny dla poprawnych canonical i Open Graph URLs
-  site: 'https://koordynujzdrowie.pl',
+  site: 'https://koordynuj-zdrowie.pl',
   
   adapter: netlify(),
   

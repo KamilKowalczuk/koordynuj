@@ -1,5 +1,6 @@
 <script lang="ts">
     import DOMPurify from 'isomorphic-dompurify';
+    
 
     export let recipientEmail = 'docelowy@email.com'; 
     export let successMessageHTML = 'Dziękujemy za zgłoszenie! Skontaktujemy się z Tobą w ciągu 24h.';

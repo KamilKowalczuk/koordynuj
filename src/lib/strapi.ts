@@ -644,3 +644,69 @@ export default {
   createExcerpt,
   checkStrapiHealth,
 };
+
+
+//Pliki regulaminów
+
+export interface LegalDocument {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  documentType: 'polityka-prywatnosci' | 'regulamin' | 'rodo' | 'polityka-cookies';
+  lastUpdated: string;
+  isActive: boolean;
+  order?: number;
+  seo?: SeoData;
+}
+
+/**
+ * Pobiera wszystkie aktywne dokumenty prawne (sortowane po order)
+ */
+export async function getLegalDocuments(): Promise<LegalDocument[] | null> {
+  try {
+    let query = 'legal-documents?sort=order:asc&filters[isActive][$eq]=true';
+    query += '&populate[seo][populate][metaImage][populate]=*';
+    
+    const response = await fetchStrapi(query);
+    return response?.data || null;
+  } catch (error) {
+    console.error('Error fetching legal documents:', error);
+    return null;
+  }
+}
+
+/**
+ * Pobiera pojedynczy dokument prawny po slug
+ */
+export async function getLegalDocument(slug: string): Promise<LegalDocument | null> {
+  try {
+    let query = `legal-documents?filters[slug][$eq]=${slug}`;
+    query += '&populate[seo][populate][metaImage][populate]=*';
+    
+    const response = await fetchStrapi(query);
+    return response?.data?.[0] || null;
+  } catch (error) {
+    console.error('Error fetching legal document:', error);
+    return null;
+  }
+}
+
+/**
+ * Pobiera dokument po typie (np. polityka-prywatnosci)
+ */
+export async function getLegalDocumentByType(
+  documentType: string
+): Promise<LegalDocument | null> {
+  try {
+    let query = `legal-documents?filters[documentType][$eq]=${documentType}&filters[isActive][$eq]=true`;
+    query += '&populate[seo][populate][metaImage][populate]=*';
+    
+    const response = await fetchStrapi(query);
+    return response?.data?.[0] || null;
+  } catch (error) {
+    console.error('Error fetching legal document by type:', error);
+    return null;
+  }
+}

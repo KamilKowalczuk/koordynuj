@@ -1,0 +1,209 @@
+---
+// src/pages/dokumenty/[slug].astro
+import MainLayout from '../../layouts/MainLayout.astro';
+import SEOHead from '../../components/seo/SEOHead.astro';
+import AnimateOnScroll from '../../components/ui/AnimateOnScroll.astro';
+import Header from '../../components/layout/Header.svelte';
+import Footer from '../../components/layout/Footer.astro';
+import ServicePanel from '../../components/ui/ServicePanel.svelte';
+import Logo from '../../components/ui/Logo.astro';
+import { getLegalDocuments, getLegalDocument } from '../../lib/strapi';
+import type { LegalDocument } from '../../lib/strapi';
+
+export async function getStaticPaths() {
+  const documents = await getLegalDocuments();
+  if (!documents) return [];
+  return documents.map((doc) => ({
+    params: { slug: doc.slug },
+    props: { doc },
+  }));
+}
+
+const { doc } = Astro.props;
+const { slug } = Astro.params;
+
+if (!doc) {
+  return new Response(null, { 
+    status: 404, 
+    statusText: `Could not find document: ${slug}`
+  });
+}
+
+const fallbackTitle = `${doc.title} | Koordynuj Zdrowie`;
+const fallbackDescription = doc.excerpt || "Dokument prawny Koordynuj Zdrowie";
+
+const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('pl-PL', { 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric' 
+});
+
+const documentIcons: Record<string, string> = {
+  'polityka-prywatnosci': `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>`,
+  'regulamin': `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>`,
+  'rodo': `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>`,
+  'polityka-cookies': `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>`
+};
+---
+
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="generator" content={Astro.generator} />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  
+  <SEOHead 
+    seo={doc.seo}
+    fallbackTitle={fallbackTitle}
+    fallbackDescription={fallbackDescription}
+  />
+</head>
+<body class="bg-background-light text-text-primary font-sans antialiased">
+  <style is:global>
+    @import '../../styles/global.css';
+  </style>
+
+  <Header client:load>
+    <div slot="logo">
+      <a href="/" class="flex-shrink-0">
+        <Logo isHomepage={false} />
+      </a>
+    </div>
+  </Header>
+  
+  <article>
+    <div class="pt-32 sm:pt-40 pb-12 sm:pb-16 bg-gradient-to-b from-background-muted to-background-light relative overflow-hidden">
+      <div class="absolute inset-0 opacity-[0.02] pointer-events-none">
+        <div class="document-header-bg-pattern absolute inset-0"></div>
+      </div>
+      
+      <AnimateOnScroll>
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-center mb-6">
+            <div class="w-16 h-16 bg-brand-blue/10 rounded-2xl flex items-center justify-center">
+              <svg class="w-8 h-8 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <Fragment set:html={documentIcons[doc.documentType]} />
+              </svg>
+            </div>
+          </div>
+          
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-6 tracking-tight text-center">
+            {doc.title}
+          </h1>
+          
+          <div class="flex items-center justify-center gap-4 text-text-muted text-sm">
+            <span>Ostatnia aktualizacja: {formatDate(doc.lastUpdated)}</span>
+          </div>
+        </div>
+      </AnimateOnScroll>
+    </div>
+
+    <div class="py-16 sm:py-20 bg-background-light">
+      <AnimateOnScroll>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="prose prose-lg prose-custom mx-auto">
+            {doc.content ? (
+              <div set:html={doc.content} />
+            ) : (
+              <p>Treść dokumentu w przygotowaniu...</p>
+            )}
+          </div>
+          
+          <div class="mt-16 pt-8 border-t border-slate-200/80 text-center">
+            <a href="/dokumenty" class="btn-primary inline-flex items-center group">
+              <svg class="mr-2 w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Wszystkie dokumenty
+            </a>
+          </div>
+        </div>
+      </AnimateOnScroll>
+    </div>
+  </article>
+
+  <ServicePanel client:load />
+  <Footer />
+</body>
+</html>
+
+<style>
+  .document-header-bg-pattern {
+    background-image: 
+      radial-gradient(circle at 30% 20%, rgba(0, 169, 224, 0.08) 1px, transparent 1px),
+      radial-gradient(circle at 70% 80%, rgba(0, 169, 224, 0.06) 1px, transparent 1px);
+    background-size: 160px 160px, 200px 200px;
+  }
+
+  /* Styling dla treści dokumentu */
+  :global(.prose-custom) {
+    color: rgb(var(--text-muted));
+  }
+
+  :global(.prose-custom h2) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: rgb(var(--text-primary));
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  :global(.prose-custom h3) {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: rgb(var(--text-primary));
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  :global(.prose-custom p) {
+    margin-bottom: 1.5rem;
+    line-height: 1.75;
+  }
+
+  :global(.prose-custom ul, .prose-custom ol) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  :global(.prose-custom li) {
+    line-height: 1.75;
+    margin-bottom: 0.5rem;
+  }
+
+  :global(.prose-custom a) {
+    color: rgb(var(--brand-blue));
+    text-decoration: underline;
+    transition: color 0.2s;
+  }
+
+  :global(.prose-custom a:hover) {
+    opacity: 0.8;
+  }
+
+  :global(.prose-custom strong) {
+    font-weight: 600;
+    color: rgb(var(--text-primary));
+  }
+
+  :global(.prose-custom blockquote) {
+    border-left: 4px solid rgba(0, 169, 224, 0.3);
+    padding-left: 1.5rem;
+    font-style: italic;
+    color: rgb(var(--text-muted));
+    margin: 2rem 0;
+  }
+
+  :global(.prose-custom code) {
+    background-color: rgb(241 245 249);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+</style>

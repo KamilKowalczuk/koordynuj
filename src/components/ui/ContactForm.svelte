@@ -11,6 +11,7 @@
     let email = '';
     let phone = '';
     let message = '';
+    let privacyAccepted = false; // DODANE
     
     type Status = 'idle' | 'submitting' | 'success' | 'error';
     let status: Status = 'idle';
@@ -28,6 +29,7 @@
         if (name.trim().length < 2) next.name = 'Podaj imię i nazwisko.';
         if (!isEmail(email.trim())) next.email = 'Proszę podać poprawny adres email.';
         if (phone.trim().length < 9) next.phone = 'Podaj poprawny numer telefonu.';
+        if (!privacyAccepted) next.privacy = 'Musisz zaakceptować politykę prywatności.'; // DODANE
         if (hp !== '') next.message = 'Błąd weryfikacji anty-spam.';
         
         errors = next;
@@ -110,6 +112,23 @@
              {#if errors.message}<p class="text-red-600 text-sm mt-1">{errors.message}</p>{/if}
         </div>
 
+        <!-- CHECKBOX POLITYKI PRYWATNOŚCI - DODANE -->
+        <div class="privacy-wrapper">
+            <label class="privacy-label">
+                <input 
+                    type="checkbox" 
+                    bind:checked={privacyAccepted}
+                    on:change={() => errors.privacy = ''}
+                />
+                <span class="privacy-text">
+                    Akceptuję <a href="/dokumenty/polityka-prywatnosci" target="_blank">politykę prywatności</a> i wyrażam zgodę na przetwarzanie moich danych osobowych.*
+                </span>
+            </label>
+            {#if errors.privacy}
+                <p class="text-red-600 text-sm mt-2">{errors.privacy}</p>
+            {/if}
+        </div>
+
         <button type="submit" disabled={status === 'submitting'} class="btn-primary w-full text-xl py-5 group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed">
             <span class="relative z-10 flex items-center justify-center">
                 {#if status === 'submitting'}
@@ -141,3 +160,42 @@
     </form>
 {/if}
 
+<style>
+    /* TYLKO STYLE DLA CHECKBOXA */
+    .privacy-wrapper {
+        padding: 1rem;
+        background-color: rgba(0, 169, 224, 0.03);
+        border-radius: 0.75rem;
+        border: 1px solid rgba(0, 169, 224, 0.1);
+    }
+
+    .privacy-label {
+        display: flex;
+        align-items: flex-start;
+        cursor: pointer;
+        gap: 0.75rem;
+    }
+
+    .privacy-label input[type="checkbox"] {
+        margin-top: 0.25rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .privacy-text {
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: rgb(var(--text-muted));
+    }
+
+    .privacy-text a {
+        color: rgb(var(--brand-blue));
+        text-decoration: underline;
+    }
+
+    .privacy-text a:hover {
+        opacity: 0.8;
+    }
+</style>

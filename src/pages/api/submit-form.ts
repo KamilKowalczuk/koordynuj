@@ -93,7 +93,7 @@ export const POST: APIRoute = async ({ request }) => {
                 data: {
                     imie_nazwisko: data.name,
                     email: data.email,
-                    // telefon: data.phone,
+                    telefon: data.phone,
                     wiadomosc: data.message,
                     status_wiadomosci: 'nowa',
                     ip_address: ipAddress,

@@ -6,7 +6,7 @@ export const prerender = false;
 // --- Konfiguracja ---
 // Pobieramy zmienne środowiskowe. Pamiętaj o ich dodaniu w Netlify!
 const NETLIFY_BUILD_HOOK = import.meta.env.NETLIFY_BUILD_HOOK_URL;
-const ADMIN_EMAIL = import.meta.env.ADMIN_EMAIL || 'twoj@email.com'; // Ustaw swój email
+const ADMIN_EMAIL = import.meta.env.ADMIN_EMAIL || 'kontakt@koordynuj-zdrowie.pl'; // Ustaw swój email
 const WEBHOOK_SECRET = import.meta.env.STRAPI_WEBHOOK_SECRET; // Opcjonalny sekret dla bezpieczeństwa
 
 /**
@@ -26,6 +26,7 @@ const REBUILD_TRIGGERS = [
   'process-step',
   'blog-post',
   'blog-category',
+  'legal-document',
 ];
 
 /**
